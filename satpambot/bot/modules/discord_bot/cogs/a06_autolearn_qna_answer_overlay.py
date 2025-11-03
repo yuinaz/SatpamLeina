@@ -12,32 +12,42 @@ def _cfg_str(k, d=""):
     except Exception:
         return str(d)
 
-async def _provider_answer(prompt: str) -> tuple[str, str]:
-    """
-    Try to use qna_dual_provider if present. It should return (text, provider_name).
-    Falls back to simple echo with provider label if only keys exist in config/env.
-    """
-    # Preferred path: use dual provider
-    try:
-        from satpambot.bot.modules.discord_bot.cogs.qna_dual_provider import QnaDualProvider  # type: ignore
-        prov = QnaDualProvider()
-        # Support both async and sync 'ask'
-        if hasattr(prov, "aask"):
-            txt, name = await prov.aask(prompt)  # type: ignore
-        else:
-            txt, name = prov.ask(prompt)         # type: ignore
-        name = name or "Gemini/Groq"
-        return (txt or "Tidak ada jawaban.", name)
-    except Exception as e:
-        log.warning("[qna-answer] dual provider unavailable, fallback: %r", e)
 
-    # Fallback path: check key presence to label provider for award overlay
-    gem = _cfg_str("GEMINI_API_KEY","")
-    groq = _cfg_str("GROQ_API_KEY","")
+async def _provider_answer(prompt: str) -> tuple[str, str]:
+    """Return (answer, provider_label). Try llm_facade in provider order, else echo minimal."""
+    order = []
+    try:
+        import os
+        raw = os.getenv("QNA_PROVIDER_ORDER", "gemini,groq") or "gemini,groq"
+        order = [s.strip().lower() for s in raw.split(",") if s.strip()]
+    except Exception:
+        order = ["gemini","groq"]
+    # Use shared facade if available
+    try:
+        from satpambot.bot.providers.llm_facade import ask as llm_ask  # type: ignore
+    except Exception:
+        llm_ask = None
+    if llm_ask:
+        for prov in order or ["gemini","groq"]:
+            try:
+                model = os.getenv("GEMINI_MODEL","gemini-2.5-flash") if prov.startswith("gem") else os.getenv("GROQ_MODEL","llama-3.1-8b-instant")
+                text = await llm_ask(provider=prov, model=model, messages=[{"role":"user","content":prompt}], system="Jawab ringkas dan aman.")
+                if text and text.strip():
+                    name = "Gemini" if prov.startswith("gem") else "Groq"
+                    return (text.strip(), name)
+            except Exception:
+                continue
+    # Fallback: echo with provider label if keys exist (legacy)
+    try:
+        from satpambot.bot.modules.discord_bot.helpers.confreader import cfg_str as _cfg
+        gem = str(_cfg("GEMINI_API_KEY",""))
+        groq = str(_cfg("GROQ_API_KEY",""))
+    except Exception:
+        gem, groq = "",""
     if gem:
-        return (f"{prompt}", "Gemini")
+        return (prompt, "Gemini")
     if groq:
-        return (f"{prompt}", "Groq")
+        return (prompt, "Groq")
     return ("Provider QnA belum terkonfigurasi.", "")
 
 class QnAAutoLearnAnswerOverlay(commands.Cog):
@@ -53,7 +63,8 @@ class QnAAutoLearnAnswerOverlay(commands.Cog):
             if not getattr(msg, "embeds", None):
                 return
             emb = msg.embeds[0]
-            if (getattr(emb, "title", "") or "").strip().lower() != "qna prompt":
+            title = (getattr(emb, "title", "") or "").strip().lower()
+            if title not in {"qna prompt", "question by leina"}:
                 return
             prompt = getattr(emb, "description", "") or ""
             if not prompt:

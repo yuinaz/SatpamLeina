@@ -1,105 +1,139 @@
-from __future__ import annotations
-import os, re, json, logging, urllib.request, time, asyncio
-from typing import Optional, List, Tuple
-import discord
 from discord.ext import commands
+import os, logging, time, re
+import discord
+
 log = logging.getLogger(__name__)
-def _env(k, d=None): v=os.getenv(k); return v if v not in (None,"") else d
-def _ids(val: Optional[str]) -> List[int]:
-    if not val: return []
-    out=[]; 
-    for part in re.split(r"[\s,]+", str(val)):
-        part=part.strip(); 
-        if not part: continue
-        try: out.append(int(part))
+
+# ==== ENV ====
+ORDER = [s.strip() for s in (os.getenv("QNA_PROVIDER_ORDER", "groq,gemini")).split(",") if s.strip()]
+PUBLIC_ID = int(os.getenv("QNA_PUBLIC_ID", "0") or 0)
+ALLOWLIST_RAW = os.getenv("QNA_PUBLIC_ALLOWLIST", "")
+PUBLIC_RATE_SEC = int(os.getenv("QNA_PUBLIC_RATE_SEC", "20"))
+ISOLATION_ID = int(os.getenv("QNA_CHANNEL_ID", "0") or 0)
+
+# Gate sources
+ENV_PUBLIC_ENABLE = os.getenv("QNA_PUBLIC_ENABLE", "0") == "1"
+UPSTASH_URL = os.getenv("UPSTASH_REDIS_REST_URL")
+UPSTASH_TOKEN = os.getenv("UPSTASH_REDIS_REST_TOKEN")
+GATE_KEY = os.getenv("QNA_PUBLIC_GATE_KEY", "qna:public:enable")
+GATE_CACHE_SEC = int(os.getenv("QNA_PUBLIC_GATE_CACHE_SEC","8"))
+
+try:
+    import httpx
+except Exception:
+    httpx = None
+
+def _allowlist() -> set[int]:
+    s = set()
+    for tok in [t.strip() for t in ALLOWLIST_RAW.split(",") if t.strip()]:
+        try: s.add(int(tok))
         except: pass
-    return out
-def _pipe(cmds):
-    b=_env("UPSTASH_REDIS_REST_URL"); t=_env("UPSTASH_REDIS_REST_TOKEN")
-    if not b or not t: return None
-    body=json.dumps(cmds).encode("utf-8")
-    req=urllib.request.Request(f"{b}/pipeline", method="POST", data=body)
-    req.add_header("Authorization", f"Bearer {t}"); req.add_header("Content-Type","application/json")
-    with urllib.request.urlopen(req, timeout=3.5) as r: return json.loads(r.read().decode("utf-8","ignore"))
-def _order() -> List[str]:
-    raw=_env("QNA_PROVIDER_ORDER","gemini,groq") or "gemini,groq"
-    return [x.strip().lower() for x in re.split(r"[\s,]+", raw) if x.strip()]
-def _has_gemini() -> bool:
-    for k in ("GEMINI_API_KEY","GOOGLE_API_KEY","GOOGLE_GENAI_API_KEY","GOOGLE_AI_API_KEY"):
-        if os.getenv(k): return True
-    return False
-def _has_groq() -> bool: return bool(os.getenv("GROQ_API_KEY"))
-async def _llm(topic: str) -> Tuple[str,str]:
+    if PUBLIC_ID: s.add(PUBLIC_ID)
+    return s
+
+ALLOW = _allowlist()
+
+async def _upstash_get(client, key):
+    if not (UPSTASH_URL and UPSTASH_TOKEN and client): return None
     try:
-        from satpambot.bot.providers.llm import LLM; llm = LLM()
-    except Exception as e:
-        log.warning("[qna-public] LLM provider missing: %r", e); return ("fallback","Maaf, LLM belum aktif.")
-    order=_order() or ["gemini","groq"]
-    for p in order:
-        try:
-            if p.startswith("gem") and _has_gemini():
-                ans=await llm.chat_gemini(prompt=topic, messages=None, system_prompt=None, temperature=0.3, max_tokens=None)
-                if ans: return ("gemini", ans)
-            if (p.startswith("groq") or p.startswith("llama") or p.startswith("mixtral")) and _has_groq():
-                ans=await llm.chat_groq(prompt=topic, messages=None, system_prompt=None, temperature=0.3, max_tokens=None)
-                if ans: return ("groq", ans)
-        except Exception as e:
-            log.warning("[qna-public] provider %s failed: %r", p, e); await asyncio.sleep(0.1)
-    try:
-        ans=await llm.chat(prompt=topic, messages=None, system_prompt=None, temperature=0.3, max_tokens=None)
-        if ans: return ("fallback", ans)
-    except Exception as e:
-        log.warning("[qna-public] llm.chat fallback failed: %r", e)
-    return ("fallback","Maaf, provider QnA sedang tidak tersedia sekarang.")
-def _cool_key(uid:int, cid:int) -> str: return f"qna:pub:cool:{uid}:{cid}"
-def _cool_sec() -> int:
-    try: return int(_env("QNA_PUBLIC_COOLDOWN_SEC","60"))
-    except: return 60
-def _award() -> int:
-    try: return int(_env("QNA_PUBLIC_ANSWER_XP","0"))
-    except: return 0
-class QnaPublicMentionReplyOverlay(commands.Cog):
+        r = await client.get(f"{UPSTASH_URL}/get/{key}", headers={"Authorization": f"Bearer {UPSTASH_TOKEN}"}, timeout=6.0)
+        if r.status_code == 200:
+            return (r.json() or {}).get("result")
+    except Exception:
+        pass
+    return None
+
+class PublicQnAReply(commands.Cog):
     def __init__(self, bot):
-        self.bot=bot
-        self.enabled = (_env("QNA_PUBLIC_ENABLE","1") or "1") not in ("0","false","False")
-        self.require_mention = (_env("QNA_PUBLIC_REQUIRE_MENTION","1") or "1") not in ("0","false","False")
-        self.allow = set(_ids(_env("QNA_PUBLIC_ALLOWLIST","")))
-        log.info("[qna-public] enable=%s require_mention=%s allow=%s", self.enabled, self.require_mention, sorted(self.allow))
-    def _ok(self, cid: Optional[int]) -> bool:
-        if not self.enabled or not cid: return False
-        if not self.allow: return True
-        return cid in self.allow
-    @commands.Cog.listener()
-    async def on_message(self, m: "discord.Message"):
-        ch=getattr(m,"channel",None); cid=getattr(ch,"id",None)
-        if not self._ok(cid): return
-        if self.require_mention:
-            me = getattr(m.guild.me,"id",None) if getattr(m,"guild",None) else getattr(getattr(self.bot,"user",None),"id",None)
-            mentioned=False
-            try:
-                for u in (getattr(m,"mentions",[]) or []):
-                    if getattr(u,"id",None)==me: mentioned=True; break
-            except Exception: mentioned=False
-            if not mentioned: return
-        uid = getattr(getattr(m, "author", None), "id", None) or 0
-        key=_cool_key(int(uid), int(cid or 0)); cool=_cool_sec()
+        self.bot = bot
+        self._last_chan = {}
+        self._client = httpx.AsyncClient() if httpx else None
+        self._gate_cache_until = 0.0
+        self._gate_cache_val = ENV_PUBLIC_ENABLE
+        log.info("[qna-public] boot | allow=%s | rate=%ss | order=%s | env_enable=%s",
+                 sorted(ALLOW) if ALLOW else "any", PUBLIC_RATE_SEC, ORDER, ENV_PUBLIC_ENABLE)
+
+    def _is_allowed_channel(self, cid: int) -> bool:
+        if ISOLATION_ID and cid == ISOLATION_ID:
+            return False
+        return (cid in ALLOW) if ALLOW else True
+
+    def _throttle_ok(self, cid: int) -> bool:
+        now = time.time()
+        last = self._last_chan.get(cid, 0.0)
+        if now - last < PUBLIC_RATE_SEC:
+            return False
+        self._last_chan[cid] = now
+        return True
+
+    async def _public_enabled(self) -> bool:
+        # env flag OR upstash gate
+        if ENV_PUBLIC_ENABLE:
+            return True
+        if not (self._client and UPSTASH_URL and UPSTASH_TOKEN):
+            return False
+        now = time.time()
+        if now < self._gate_cache_until:
+            return self._gate_cache_val
+        val = await _upstash_get(self._client, GATE_KEY)
+        self._gate_cache_val = (str(val) == "1")
+        self._gate_cache_until = now + GATE_CACHE_SEC
+        return self._gate_cache_val
+
+    def _extract_query(self, msg: discord.Message) -> str:
+        text = msg.content or ""
+        if self.bot.user and self.bot.user.mention in text:
+            text = text.replace(self.bot.user.mention, "").strip()
+        text = re.sub(r'^\s*leina(chan)?[:,]?\s*', '', text, flags=re.I)
+        return text.strip()
+
+    async def _ask_llm(self, question: str):
         try:
-            r=_pipe([["GET", key]])
-            if r and r[0].get("result"): return
-            _pipe([["SETEX", key, str(cool), "1"]])
-        except Exception: pass
-        content=(getattr(m,"content","") or "")
-        topic=re.sub(r"<@!?(\d+)>","",content).strip()
-        if not topic: return
-        prov, text = await _llm(topic)
-        try:
-            emb=discord.Embed(title=f"Answer by {prov.capitalize()}", description=text, colour=getattr(discord.Colour,"blue")().value)
-            await m.reply(embed=emb, mention_author=False)
+            from ....providers.llm_facade import ask as llm_ask
         except Exception:
-            try: await ch.send(text or "Maaf, gagal memproses pertanyaan.")
-            except: pass
-        amt=_award()
-        if amt:
-            try: self.bot.dispatch("xp_add", uid, amt, "public_mention_qna")
-            except Exception: pass
-async def setup(bot): await bot.add_cog(QnaPublicMentionReplyOverlay(bot))
+            llm_ask = None
+        if not llm_ask:
+            return None, None
+        for prov in ORDER:
+            try:
+                model = os.getenv('GROQ_MODEL') if prov == 'groq' else os.getenv('GEMINI_MODEL')
+                txt = await llm_ask(provider=prov, model=model,
+                                    system='Jawab singkat, padat, aman, netral.',
+                                    messages=[{'role':'user','content': question}],
+                                    temperature=0.7, max_tokens=320)
+                if txt and txt.strip():
+                    return txt.strip(), prov.capitalize()
+            except Exception:
+                continue
+        return None, None
+
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message):
+        if message.author.bot:
+            return
+        if not await self._public_enabled():
+            return
+        if not self._is_allowed_channel(message.channel.id):
+            return
+        content = message.content or ""
+        has_mention = (self.bot.user and self.bot.user.mention in content)
+        looks_pref = re.match(r'^\s*leina(chan)?\b', content, flags=re.I) is not None
+        if not (has_mention or looks_pref):
+            return
+        if not self._throttle_ok(message.channel.id):
+            return
+        q = self._extract_query(message)
+        if not q:
+            return
+        try:
+            await message.channel.trigger_typing()
+        except Exception:
+            pass
+        ans, prov = await self._ask_llm(q)
+        if not ans:
+            return
+        emb = discord.Embed(title=f"Answer by {prov or 'Provider'}", description=ans)
+        await message.channel.send(embed=emb)
+
+async def setup(bot: commands.Bot):
+    await bot.add_cog(PublicQnAReply(bot))

@@ -13,11 +13,11 @@ else:
 
 log = logging.getLogger(__name__)
 
-ENABLE = os.getenv("QNA_AUTOLEARN_ENABLE", "1") == "1"
+ENABLE = os.getenv("QNA_AUTOLEARN_ENABLE", "0") == "1"
 TOPICS_PATH = os.getenv("QNA_TOPICS_PATH", "data/config/qna_topics.json")
 PERIOD = int(os.getenv("QNA_AUTOLEARN_PERIOD_SEC", "180"))  # 3 menit per permintaan user
 CHANNEL_ID = int(os.getenv("QNA_CHANNEL_ID", "0") or 0)     # channel isolasi untuk seed pertanyaan
-TITLE_ISO = os.getenv("QNA_TITLE_ISOLATION", "Answer by {provider}")
+TITLE_ISO = os.getenv("QNA_TITLE_ISOLATION", "Question by Leina")
 TITLE_PUB = os.getenv("QNA_TITLE_PUBLIC", "Answer by Leina")
 
 def _flatten_topics(data: Any) -> List[str]:
@@ -142,8 +142,9 @@ class QnAAutoLearnScheduler(commands.Cog):  # type: ignore[misc]
             log.warning("[qna-autolearn] channel not found: %s", CHANNEL_ID)
             return
         # Simple seed embed (title uses isolation title)
-        content = f"**{TITLE_ISO}**\n\n{topic}"
-        await ch.send(content)
+        import discord
+        emb = discord.Embed(title=TITLE_ISO, description=topic)
+        await ch.send(embed=emb)
         log.info("[qna-autolearn] posted seed -> %s", topic[:80])
 
     async def _resolve_channel(self, ch_id: int):
