@@ -619,48 +619,8 @@
       ]
     },
     "228126085160763392": {
-      "xp": 1943,
+      "xp": 2063,
       "awards": [
-        {
-          "ts": "2025-10-31T15:31:12.994371+00:00",
-          "amount": 15,
-          "reason": "passive_message"
-        },
-        {
-          "ts": "2025-10-31T15:31:13.254640+00:00",
-          "amount": 15,
-          "reason": "passive_message"
-        },
-        {
-          "ts": "2025-10-31T15:31:14.314096+00:00",
-          "amount": 15,
-          "reason": "passive_message"
-        },
-        {
-          "ts": "2025-10-31T15:31:14.350397+00:00",
-          "amount": 15,
-          "reason": "passive_message"
-        },
-        {
-          "ts": "2025-10-31T15:31:14.610424+00:00",
-          "amount": 15,
-          "reason": "passive_message"
-        },
-        {
-          "ts": "2025-10-31T15:31:25.003071+00:00",
-          "amount": 15,
-          "reason": "passive_message"
-        },
-        {
-          "ts": "2025-10-31T15:31:25.046769+00:00",
-          "amount": 15,
-          "reason": "passive_message"
-        },
-        {
-          "ts": "2025-10-31T15:31:26.579310+00:00",
-          "amount": 15,
-          "reason": "passive_message"
-        },
         {
           "ts": "2025-10-31T15:31:40.769245+00:00",
           "amount": 15,
@@ -870,11 +830,51 @@
           "ts": "2025-10-31T15:50:46.263068+00:00",
           "amount": 15,
           "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-05T12:24:55.341243+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-05T12:24:55.379252+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-05T12:24:56.033693+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-05T12:24:56.062654+00:00",
+          "amount": 15,
+          "reason": "force-include"
+        },
+        {
+          "ts": "2025-11-05T12:24:56.105039+00:00",
+          "amount": 15,
+          "reason": "force-include"
+        },
+        {
+          "ts": "2025-11-05T12:27:58.252121+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-05T12:27:58.291637+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-05T12:27:58.941117+00:00",
+          "amount": 15,
+          "reason": "passive_message"
         }
       ]
     },
     "zenarius": {
-      "xp": 620,
+      "xp": 680,
       "awards": [
         {
           "ts": "2025-10-28T13:15:37.849424+00:00",
@@ -1088,6 +1088,26 @@
         },
         {
           "ts": "2025-10-31T15:50:03.169407+00:00",
+          "amount": 15,
+          "reason": "chat:message"
+        },
+        {
+          "ts": "2025-11-05T12:24:56.758340+00:00",
+          "amount": 15,
+          "reason": "chat:message"
+        },
+        {
+          "ts": "2025-11-05T12:24:56.787345+00:00",
+          "amount": 15,
+          "reason": "chat:message"
+        },
+        {
+          "ts": "2025-11-05T12:27:58.970122+00:00",
+          "amount": 15,
+          "reason": "chat:message"
+        },
+        {
+          "ts": "2025-11-05T12:27:59.000641+00:00",
           "amount": 15,
           "reason": "chat:message"
         }
@@ -4622,12 +4642,47 @@
           "reason": "chat:message"
         }
       ]
+    },
+    "381295737977307137": {
+      "xp": 45,
+      "awards": [
+        {
+          "ts": "2025-11-05T12:29:52.077269+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-05T12:29:52.116953+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-05T12:29:52.984250+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        }
+      ]
+    },
+    "yuuki_niiyan": {
+      "xp": 30,
+      "awards": [
+        {
+          "ts": "2025-11-05T12:29:53.011818+00:00",
+          "amount": 15,
+          "reason": "chat:message"
+        },
+        {
+          "ts": "2025-11-05T12:29:53.042447+00:00",
+          "amount": 15,
+          "reason": "chat:message"
+        }
+      ]
     }
   },
   "stats": {
     "total_awards": 8,
     "total_users": 1
   },
-  "updated_at": "2025-10-31T15:51:10.398252+00:00",
+  "updated_at": "2025-11-05T12:29:53.042447+00:00",
   "awards": {}
 }

@@ -1,9 +1,0 @@
-{
-  "env": {
-    "QNA_ENABLE": "1",
-    "QNA_CHANNEL_ID": "1426571542627614772",
-    "QNA_INTERVAL_SEC": "180",
-    "LLM_GEMINI_MODEL": "gemini-2.5-flash-lite",
-    "LLM_GROQ_MODEL": "llama-3.1-8b-instant"
-  }
-}

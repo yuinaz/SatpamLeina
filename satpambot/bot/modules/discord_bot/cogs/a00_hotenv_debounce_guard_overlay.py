@@ -1,79 +1,148 @@
 
-# a00_hotenv_debounce_guard_overlay.py
-# Debounce repeated 'hotenv_reload' events so they broadcast once.
-# FIX: Use global counters inside the inner coroutine to avoid UnboundLocalError.
-
-import os
-import asyncio
-import logging
 from discord.ext import commands
+import os, asyncio, logging, json, hashlib, time
+from pathlib import Path
+from collections import OrderedDict
 
-_PATCH_FLAG = "_patched_by_hotenv_debounce_guard"
+try:
+    from ....helpers import hotenv_segment_utils as H
+except Exception:
+    H = None
 
-_WINDOW_MS = int(os.getenv("HOTENV_DEBOUNCE_MS", "1200"))
-_MAX_WAIT_MS = int(os.getenv("HOTENV_DEBOUNCE_MAX_MS", "3500"))
+log = logging.getLogger(__name__)
 
-_debounce_task = None
-_pending_count = 0
-_last_args = ()
-_last_kwargs = {}
+DEFAULT_PATHS = [
+    "overrides.render-free.json",
+    "overrides.render_free.json",
+    "overrides.json",
+]
 
-def _patch_dispatch():
-    global _debounce_task, _pending_count, _last_args, _last_kwargs
+def _find_path() -> Path:
+    raw = os.getenv("HOTENV_OVERRIDES_PATH","").strip()
+    if raw:
+        p = Path(raw)
+        if p.exists():
+            return p
+    for name in DEFAULT_PATHS:
+        p = Path(name)
+        if p.exists():
+            return p
+    return Path("overrides.render-free.json")  # fallback
 
-    Bot = commands.Bot
-    if getattr(Bot.dispatch, _PATCH_FLAG, False):
-        return
+class HotenvDebounceGuard(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+        self.debounce_ms = int(os.getenv("HOTENV_DEBOUNCE_MS","1200"))
+        self.path = _find_path()
+        self.cache_file = Path(os.getenv("HOTENV_CACHE_FILE","data/cache/hotenv_segment_hash.json"))
+        self._pending = 0
+        self._timer_task = None
+        self._last_mtime = 0.0
+        self._last_seg_hash = {}
+        self._lock = asyncio.Lock()
+        self.cache_file.parent.mkdir(parents=True, exist_ok=True)
+        self._load_cache()
+        log.info("[hotenv-guard] watching %s | debounce=%sms", self.path, self.debounce_ms)
 
-    original_dispatch = Bot.dispatch
+    # ---------- cache ----------
+    def _load_cache(self):
+        try:
+            if self.cache_file.exists():
+                with open(self.cache_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                self._last_seg_hash = data.get("segments", {})
+                self._last_mtime = float(data.get("mtime", 0.0))
+        except Exception:
+            self._last_seg_hash = {}
+            self._last_mtime = 0.0
 
-    def patched_dispatch(self, event_name, *args, **kwargs):
-        global _debounce_task, _pending_count, _last_args, _last_kwargs
-        if event_name != "hotenv_reload":
-            return original_dispatch(self, event_name, *args, **kwargs)
+    def _save_cache(self, seg_hash: dict, mtime: float):
+        try:
+            with open(self.cache_file, "w", encoding="utf-8") as f:
+                json.dump({"segments": seg_hash, "mtime": mtime}, f, ensure_ascii=False, indent=2)
+        except Exception:
+            pass
 
-        _pending_count += 1
-        _last_args = args
-        _last_kwargs = kwargs
+    # ---------- helpers ----------
+    def _read_env(self) -> "OrderedDict[str,str] | None":
+        try:
+            if not self.path.exists():
+                return None
+            text = self.path.read_text(encoding="utf-8")
+            data = json.loads(text, object_pairs_hook=OrderedDict)
+            env = data.get("env")
+            if not isinstance(env, (dict, OrderedDict)):
+                return None
+            return OrderedDict(env.items())
+        except Exception as e:
+            log.warning("[hotenv-guard] read error: %r", e)
+            return None
 
-        if _debounce_task and not _debounce_task.done():
-            # already scheduled; just coalesce
+    def _current_seg_hash(self, env_od) -> dict:
+        if not H:
+            # fallback: one-shot hash of whole env
+            blob = json.dumps(env_od, ensure_ascii=False, sort_keys=True, separators=(',',':'))
+            return {"ROOT": hashlib.sha1(blob.encode()).hexdigest()}
+        return H.sha1_segments(env_od)
+
+    # ---------- core ----------
+    async def _schedule_fire(self):
+        if self._timer_task and not self._timer_task.done():
+            return
+        # debounce timer
+        async def _wait_and_fire():
+            await asyncio.sleep(self.debounce_ms / 1000.0)
+            await self._handle_fire()
+        self._timer_task = asyncio.create_task(_wait_and_fire(), name="hotenv_debounce")
+
+    async def _handle_fire(self):
+        async with self._lock:
+            pending = self._pending
+            self._pending = 0
+        if pending <= 0:
+            return
+        # read file & compare
+        env_od = self._read_env()
+        if env_od is None:
+            log.warning("[hotenv-guard] no env found in %s", self.path)
+            return
+        try:
+            mtime = self.path.stat().st_mtime
+        except Exception:
+            mtime = time.time()
+
+        seg_hash = self._current_seg_hash(env_od)
+        prev = self._last_seg_hash or {}
+        if seg_hash == prev:
+            log.warning("[hotenv-change] ignored hotenv_reload (no config change)")
             return
 
-        async def _fire_once():
-            global _pending_count, _last_args, _last_kwargs
-            try:
-                waited = 0
-                # initial window
-                await asyncio.sleep(_WINDOW_MS / 1000.0)
-                waited += _WINDOW_MS
+        # compute change sets for logs
+        if H:
+            added, removed, changed = H.diff_segments(prev, seg_hash)
+        else:
+            added, removed, changed = [], [], ["ROOT"]
 
-                # Extend a little if more events came in, but cap.
-                while _pending_count > 1 and waited < _MAX_WAIT_MS:
-                    await asyncio.sleep(0.15)
-                    waited += 150
+        # update cache
+        self._last_seg_hash = seg_hash
+        self._last_mtime = mtime
+        self._save_cache(seg_hash, mtime)
 
-                cnt = _pending_count
-                _pending_count = 0
-                logging.warning("[hotenv-debounce] coalesced %d hotenv_reload event(s); waited=%dms", cnt, waited)
-                # forward once
-                return original_dispatch(self, "hotenv_reload", *_last_args, **_last_kwargs)
-            except Exception as e:
-                logging.exception("[hotenv-debounce] dispatch failed: %r", e)
+        # forward a single consolidated event with details
+        payload = {"segments_added": added, "segments_removed": removed, "segments_changed": changed, "mtime": mtime}
+        log.info("[hotenv-change] apply -> added=%s removed=%s changed=%s", added, removed, changed)
+        try:
+            self.bot.dispatch("hotenv_change", payload)
+        except Exception:
+            pass
 
-        _debounce_task = asyncio.create_task(_fire_once())
+    # ---------- event hooks ----------
+    async def on_hotenv_reload(self, *args, **kwargs):
+        # coalesce multiple broadcasts
+        self._pending += 1
+        if self._pending > 1:
+            log.warning("[hotenv-debounce] coalesced %s hotenv_reload event(s); waited=%sms", self._pending, self.debounce_ms)
+        await self._schedule_fire()
 
-    patched_dispatch.__dict__[_PATCH_FLAG] = True
-    Bot.dispatch = patched_dispatch
-    logging.warning("[hotenv-debounce] Bot.dispatch patched (window=%dms max=%dms)", _WINDOW_MS, _MAX_WAIT_MS)
-
-def setup_patch():
-    try:
-        _patch_dispatch()
-    except Exception as e:
-        logging.exception("[hotenv-debounce] patch failed: %r", e)
-
-setup_patch()
-
-async def setup(bot):
-    logging.debug("[hotenv-debounce] overlay setup complete")
+async def setup(bot: commands.Bot):
+    await bot.add_cog(HotenvDebounceGuard(bot))

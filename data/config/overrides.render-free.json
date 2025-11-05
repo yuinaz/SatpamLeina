@@ -1,6 +1,7 @@
 {
   "env": {
     "---------------- QNA ----------------": "",
+    "QNA_TOPICS_FILE": "data/config/qna_topics.json",
     "QNA_AUTOREPLY_SEED_ENABLE": "0",
     "QNA_SEED_GATE_KEY": "qna:seed:gate",
     "QNA_SEED_GATE_TTL_SEC": "90",
@@ -328,14 +329,16 @@
     "WARN_REACTION_DISABLE": "1",
     "WARN_REACTION_REMOVE_DELAY_S": "0.0",
     "---------------- RUNTIME: HOTENV / CONFIG WATCH ----------------": "",
+    "HOTENV_OVERRIDES_PATH": "data/config/overrides.render-free.json",
+    "HOTENV_CACHE_FILE": "data/cache/hotenv_segment_hash.json",
     "HOTENV_ENABLE": "1",
     "HOTENV_MODE": "category",
-    "HOTENV_DEBOUNCE_MS": "800",
+    "HOTENV_DEBOUNCE_MS": "1200",
     "HOTENV_PREFIX": "satpambot.bot.modules.discord_bot.cogs.",
     "HOTENV_WATCH_FILES": "data/config/overrides.render-free.json,data/config/runtime_env.json,.env",
     "HOTENV_EXCLUDE": "satpambot.bot.modules.discord_bot.cogs.a00_hotenv_autoreload_overlay",
     "HOTENV_BROADCAST_EVENT": "1",
-    "HOTENV_CATEGORY_MAP_JSON": "{\"QNA\":[\"satpambot.bot.modules.discord_bot.cogs.a24_qna_autolearn_scheduler\",\"satpambot.bot.modules.discord_bot.cogs.a06_autolearn_qna_answer_overlay\",\"satpambot.bot.modules.discord_bot.cogs.a24_qna_auto_answer_overlay\"],\"XP / LADDER\":[\"satpambot.bot.modules.discord_bot.cogs.a08y_phase_autoswitch_overlay\",\"satpambot.bot.modules.discord_bot.cogs.a08_xp_event_bridge_overlay\",\"satpambot.bot.modules.discord_bot.cogs.a08f_passive_to_bot_bridge_overlay\",\"satpambot.bot.modules.discord_bot.cogs.a08_xp_stage_recompute_overlay\",\"satpambot.bot.modules.discord_bot.cogs.a09_leina_xp_status_embed_overlay\",\"satpambot.bot.modules.discord_bot.cogs.a09_work_xp_overlay\"],\"RUNTIME: MEMORY / PERSONA\":[\"satpambot.bot.modules.discord_bot.cogs.persona_loader_overlay\",\"satpambot.bot.modules.discord_bot.cogs.short_memory_manager\"],\"RUNTIME: LEARN / NEURO / MINER\":[\"satpambot.bot.modules.discord_bot.cogs.neuro_autolearn_moderated_v2\",\"satpambot.bot.modules.discord_bot.cogs.learning_passive_observer\"]}",
+    "HOTENV_CATEGORY_MAP_JSON": "{\"QNA\": [\"satpambot.bot.modules.discord_bot.cogs.a24_qna_autolearn_scheduler\", \"satpambot.bot.modules.discord_bot.cogs.a06_autolearn_qna_answer_overlay\", \"satpambot.bot.modules.discord_bot.cogs.a24_qna_auto_answer_overlay\", \"satpambot.bot.modules.discord_bot.cogs.a00_qna_provider_autofailover_quota_overlay\"], \"XP / LADDER\": [\"satpambot.bot.modules.discord_bot.cogs.a08y_phase_autoswitch_overlay\", \"satpambot.bot.modules.discord_bot.cogs.a08_xp_event_bridge_overlay\", \"satpambot.bot.modules.discord_bot.cogs.a08f_passive_to_bot_bridge_overlay\", \"satpambot.bot.modules.discord_bot.cogs.a08_xp_stage_recompute_overlay\", \"satpambot.bot.modules.discord_bot.cogs.a09_leina_xp_status_embed_overlay\", \"satpambot.bot.modules.discord_bot.cogs.a09_work_xp_overlay\"], \"RUNTIME: MEMORY / PERSONA\": [\"satpambot.bot.modules.discord_bot.cogs.persona_loader_overlay\", \"satpambot.bot.modules.discord_bot.cogs.short_memory_manager\"], \"RUNTIME: LEARN / NEURO / MINER\": [\"satpambot.bot.modules.discord_bot.cogs.neuro_autolearn_moderated_v2\", \"satpambot.bot.modules.discord_bot.cogs.learning_passive_observer\"]}",
     "REQUIREMENTS_FILE": "requirements.latest.txt",
     "SATPAMBOT_ENV_FILE": "/dev/null",
     "---------------- RUNTIME: OAUTH / WEB ----------------": "",
@@ -407,7 +410,7 @@
     "COGS_ALLOWLIST_SRC": "map",
     "COGS_ALLOWLIST": "",
     "COGS_ALLOWLIST_FILE": "data/config/hotenv_reload_exts.list",
-    "COGS_ALWAYS": "satpambot.bot.modules.discord_bot.cogs.a00_hotenv_autoreload_overlay,satpambot.bot.modules.discord_bot.cogs.a00_cogs_lazy_loader_overlay",
+    "COGS_ALWAYS": "satpambot.bot.modules.discord_bot.cogs.a00_hotenv_autoreload_overlay,satpambot.bot.modules.discord_bot.cogs.a00_cogs_lazy_loader_overlay,satpambot.bot.modules.discord_bot.cogs.a00_hotenv_debounce_guard_overlay,satpambot.bot.modules.discord_bot.cogs.a00_qna_provider_autofailover_quota_overlay,satpambot.bot.modules.discord_bot.cogs.a00_channel_policy_gate_overlay",
     "COGS_BLOCKLIST": "",
     "COGS_AUTOUNLOAD": "1",
     "COGS_TRIM_ON_READY": "1",
@@ -437,7 +440,13 @@
     "LEINA_MEMORY_DIR": "data/memory",
     "LEINA_MEMORY_FLUSH_SEC": "900",
     "NEURO_ENABLE": "1",
+	"XP_STATUS_CHANNEL_ID": "1400375184048787566",
+    "XP_STATUS_MESSAGE_ID": "1432060859252998268",
     "PUBLIC_GATE_ENABLE": "0",
-    "PUBLIC_GATE_COOLDOWN_SEC": "3"
+    "PUBLIC_GATE_COOLDOWN_SEC": "3",
+    "HOTENV_RELOAD_ON_BOOT": "0",
+	"HOTENV_DISABLE": "1",
+    "HOTENV_AUTORELOAD_ON_STARTUP": "0",
+    "HOTENV_WATCH_GLOBS": "data/config/overrides.render-free.json;data/config/overrides.render-qna-min.json"
   }
 }

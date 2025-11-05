@@ -1,9 +1,0 @@
-{
-  "env": {
-    "KV_JSON_CHANNEL_ID": "1400375184048787566",
-    "KV_JSON_MESSAGE_ID": "1432060859252998268",
-    "KV_JSON_MARKER": "leina:xp_status",
-    "KV_JSON_MIN_EDIT_SEC": "2",
-    "XP_SENIOR_KEY": "xp:bot:senior_total"
-  }
-}

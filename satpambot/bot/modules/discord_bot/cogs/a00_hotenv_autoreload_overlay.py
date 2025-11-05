@@ -15,7 +15,7 @@ INTERVAL = int(os.getenv("HOTENV_INTERVAL_SEC", "5"))
 DEBOUNCE_MS = int(os.getenv("HOTENV_DEBOUNCE_MS", "800"))
 MODE = (os.getenv("HOTENV_MODE", "category") or "category").lower()  # category | auto | allowlist
 PREFIX = os.getenv("HOTENV_PREFIX", "satpambot.bot.modules.discord_bot.cogs.")
-WATCH_FILES = [p.strip() for p in os.getenv("HOTENV_WATCH_FILES","data/config/overrides.render-free.json,data/config/runtime_env.json,.env").split(",") if p.strip()]
+WATCH_FILES = [p.strip() for p in os.getenv("HOTENV_WATCH_FILES","data/config/overrides.render-free.json").split(",") if p.strip()]
 RELOAD_EXTS = [m.strip() for m in os.getenv("HOTENV_RELOAD_EXTS","").split(",") if m.strip()]
 EXCLUDE = [m.strip() for m in os.getenv("HOTENV_EXCLUDE","satpambot.bot.modules.discord_bot.cogs.a00_hotenv_autoreload_overlay").split(",") if m.strip()]
 BROADCAST = os.getenv("HOTENV_BROADCAST_EVENT", "1") == "1"

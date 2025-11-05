@@ -9,5 +9,9 @@
     "award": 94,
     "base": 94,
     "weekend": false
+  },
+  "2025-W45": {
+    "scheduled_ts": 1762609500,
+    "triggered": false
   }
 }

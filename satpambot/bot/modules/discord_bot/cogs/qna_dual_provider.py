@@ -1,49 +1,60 @@
-
 from __future__ import annotations
-import os, asyncio, logging
-from typing import Tuple, Optional, List
-from discord.ext import commands
-
+import os, logging, asyncio
+from typing import Optional, Tuple
 log = logging.getLogger(__name__)
-
-def _order() -> List[str]:
-    raw = os.getenv("QNA_PROVIDER_ORDER", "gemini,groq") or "gemini,groq"
-    return [s.strip().lower() for s in raw.split(",") if s.strip()]
-
-def _model_for(provider: str) -> str:
-    if provider.startswith("gem"):
-        return os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
-    return os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
-
-async def _ask_llm(provider: str, prompt: str) -> Optional[str]:
-    try:
-        from satpambot.bot.providers.llm_facade import ask  # type: ignore
-    except Exception as e:
-        log.warning("[qna-dual] llm_facade missing: %r", e)
-        return None
-    try:
-        text = await ask(provider=provider, model=_model_for(provider),
-                         messages=[{"role":"user","content":prompt}], system="Jawab ringkas dan aman.")
-        return (text or "").strip() or None
-    except Exception as e:
-        log.warning("[qna-dual] provider %s failed: %r", provider, e)
-        return None
-
-class QnaDualProvider(commands.Cog):
-    """Tiny facade to answer a question using provider order env."""
-    def __init__(self, bot: commands.Bot | None = None):
+def _split_order(v: str) -> list[str]:
+    parts = []
+    for p in (v or "").replace(";", ",").split(","):
+        p = p.strip().lower()
+        if p: parts.append(p)
+    return parts or ["groq","gemini"]
+class QnaDualProvider:
+    def __init__(self, bot=None):
         self.bot = bot
-
-    async def aask(self, prompt: str) -> Tuple[str, str]:
-        for prov in _order() or ["gemini","groq"]:
-            ans = await _ask_llm(prov, prompt)
-            if ans:
-                return ans, ("Gemini" if prov.startswith("gem") else "Groq")
-        return "Provider QnA belum terkonfigurasi.", ""
-
-    # Sync helper (not used by runtime, but for backward compat)
-    def ask(self, prompt: str) -> Tuple[str, str]:
-        return asyncio.get_event_loop().run_until_complete(self.aask(prompt))
-
-async def setup(bot: commands.Bot):
-    await bot.add_cog(QnaDualProvider(bot))
+        self.order = _split_order(os.getenv("QNA_PROVIDER_ORDER", "groq,gemini"))
+        self.groq_model = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
+        self.gemini_model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
+    async def aask(self, question: str) -> Tuple[Optional[str], Optional[str]]:
+        for name in self.order:
+            try:
+                if name == "groq":
+                    text = await asyncio.to_thread(self._ask_groq, question)
+                    if text: return text, "Groq"
+                if name == "gemini":
+                    text = await asyncio.to_thread(self._ask_gemini, question)
+                    if text: return text, "Gemini"
+            except Exception as e:
+                log.warning("[QnaDualProvider] %s failed: %r", name, e)
+                continue
+        return None, None
+    def _ask_groq(self, prompt: str) -> Optional[str]:
+        key = os.getenv("GROQ_API_KEY") or ""
+        if not key: return None
+        try:
+            from groq import Groq  # type: ignore
+            client = Groq(api_key=key)
+            res = client.chat.completions.create(
+                model=self.groq_model,
+                messages=[{"role":"user","content":prompt}], temperature=0.2
+            )
+            return (res.choices[0].message.content or "").strip() or None
+        except Exception as e:
+            log.debug("[QnaDualProvider] groq error: %r", e); return None
+    def _ask_gemini(self, prompt: str) -> Optional[str]:
+        key = os.getenv("GEMINI_API_KEY") or ""
+        if not key: return None
+        try:
+            import google.generativeai as genai  # type: ignore
+            genai.configure(api_key=key)
+            model = genai.GenerativeModel(self.gemini_model)
+            resp = model.generate_content(prompt)
+            text = getattr(resp, "text", None)
+            if not text and getattr(resp, "candidates", None):
+                for cand in resp.candidates:
+                    parts = getattr(getattr(cand, "content", None), "parts", None)
+                    if parts:
+                        text = "".join(getattr(p,"text","") for p in parts if hasattr(p,"text"))
+                        if text: break
+            return (text or "").strip() or None
+        except Exception as e:
+            log.debug("[QnaDualProvider] gemini error: %r", e); return None

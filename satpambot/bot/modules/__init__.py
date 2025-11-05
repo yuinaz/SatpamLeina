@@ -1,1 +1,1 @@
-# package marker
+# package init (stub)
