@@ -79,19 +79,19 @@ class XpConsistencyOverlay(commands.Cog):
 
             # Read current
             try:
-                cur_status = await us.cmd("GET", "learning:status")
+                cur_status = await us.get_raw("learning:status")
             except Exception:
                 cur_status = None
             try:
-                cur_json = await us.cmd("GET", "learning:status_json")
+                cur_json = await us.get_raw("learning:status_json")
             except Exception:
                 cur_json = None
 
             # Only write when needed
             if str(cur_status) != status:
-                await us.cmd("SET", "learning:status", (_status if _status is not None else (_status if _status is not None else (_status if _status is not None else status))))
+                await us.set("learning:status", (_status if _status is not None else (_status if _status is not None else (_status if _status is not None else status))))
             if str(cur_json) != status_json:
-                await us.cmd("SET", "learning:status_json", (_status_json if _status_json is not None else (_status_json if _status_json is not None else (_status_json if _status_json is not None else status_json))))
+                await us.set("learning:status_json", (_status_json if _status_json is not None else (_status_json if _status_json is not None else (_status_json if _status_json is not None else status_json))))
 
         except Exception as e:
             log.debug("[xp-consistency] tick failed: %r", e)

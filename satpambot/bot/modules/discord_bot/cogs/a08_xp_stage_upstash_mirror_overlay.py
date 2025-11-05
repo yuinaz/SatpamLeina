@@ -62,7 +62,7 @@ class XpStageUpstashMirrorOverlay(commands.Cog):
     async def _upstash_set(self, k: str, v):
         try:
             from satpambot.bot.modules.discord_bot.helpers.upstash_client import UpstashClient
-            cli = UpstashClient(); await cli.cmd("SET", k, str(v))
+            cli = UpstashClient(); await cli.set(k, str(v))
         except Exception:
             pass
 

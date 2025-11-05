@@ -38,7 +38,7 @@ class XpLadderReporterOverlay(commands.Cog):
             pct   = float(m.get("xp:stage:percent",0) or 0.0)
 
             try:
-                total_raw = await us.cmd("GET", self.total_key)
+                total_raw = await us.get_raw(self.total_key)
             except Exception:
                 total_raw = None
             total = _to_int(total_raw, _to_int(m.get(self.total_key, 0), 0))

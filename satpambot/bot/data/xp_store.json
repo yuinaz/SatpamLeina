@@ -9,7 +9,7 @@
       }
     },
     "704822303355043890": {
-      "xp": 135,
+      "xp": 270,
       "awards": [
         {
           "ts": "2025-10-28T12:36:24.679559+00:00",
@@ -55,11 +55,56 @@
           "ts": "2025-10-28T12:37:36.998536+00:00",
           "amount": 15,
           "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-05T15:40:34.384082+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-05T15:40:34.423360+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-05T15:40:35.874672+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-05T15:40:36.348402+00:00",
+          "amount": 15,
+          "reason": "shadow_exposure"
+        },
+        {
+          "ts": "2025-11-05T15:40:36.379191+00:00",
+          "amount": 15,
+          "reason": "shadow_exposure"
+        },
+        {
+          "ts": "2025-11-05T15:40:36.775497+00:00",
+          "amount": 15,
+          "reason": "shadow_exposure"
+        },
+        {
+          "ts": "2025-11-05T15:41:38.046458+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-05T15:41:38.085018+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-05T15:41:38.706311+00:00",
+          "amount": 15,
+          "reason": "passive_message"
         }
       ]
     },
     "vanssr": {
-      "xp": 40,
+      "xp": 100,
       "awards": [
         {
           "ts": "2025-10-28T12:36:25.421960+00:00",
@@ -90,6 +135,26 @@
           "ts": "2025-10-28T12:37:26.223679+00:00",
           "amount": 10,
           "reason": "normalize:chat:message"
+        },
+        {
+          "ts": "2025-11-05T15:40:35.906729+00:00",
+          "amount": 15,
+          "reason": "chat:message"
+        },
+        {
+          "ts": "2025-11-05T15:40:35.936322+00:00",
+          "amount": 15,
+          "reason": "chat:message"
+        },
+        {
+          "ts": "2025-11-05T15:41:38.736169+00:00",
+          "amount": 15,
+          "reason": "chat:message"
+        },
+        {
+          "ts": "2025-11-05T15:41:38.767803+00:00",
+          "amount": 15,
+          "reason": "chat:message"
         }
       ]
     },
@@ -2934,7 +2999,7 @@
       ]
     },
     "591110650718322688": {
-      "xp": 225,
+      "xp": 345,
       "awards": [
         {
           "ts": "2025-10-30T11:34:44.129614+00:00",
@@ -3010,11 +3075,51 @@
           "ts": "2025-10-30T11:35:19.584742+00:00",
           "amount": 15,
           "reason": "force-include"
+        },
+        {
+          "ts": "2025-11-05T15:44:31.858259+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-05T15:44:31.902270+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-05T15:44:32.300377+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-05T15:44:32.334845+00:00",
+          "amount": 15,
+          "reason": "force-include"
+        },
+        {
+          "ts": "2025-11-05T15:44:32.377395+00:00",
+          "amount": 15,
+          "reason": "force-include"
+        },
+        {
+          "ts": "2025-11-05T15:44:33.190195+00:00",
+          "amount": 15,
+          "reason": "shadow_exposure"
+        },
+        {
+          "ts": "2025-11-05T15:44:33.221475+00:00",
+          "amount": 15,
+          "reason": "shadow_exposure"
+        },
+        {
+          "ts": "2025-11-05T15:44:33.870167+00:00",
+          "amount": 15,
+          "reason": "shadow_exposure"
         }
       ]
     },
     "nagatsuki777": {
-      "xp": 30,
+      "xp": 60,
       "awards": [
         {
           "ts": "2025-10-30T11:34:53.385242+00:00",
@@ -3023,6 +3128,16 @@
         },
         {
           "ts": "2025-10-30T11:34:55.093614+00:00",
+          "amount": 15,
+          "reason": "chat:message"
+        },
+        {
+          "ts": "2025-11-05T15:44:32.760346+00:00",
+          "amount": 15,
+          "reason": "chat:message"
+        },
+        {
+          "ts": "2025-11-05T15:44:32.790457+00:00",
           "amount": 15,
           "reason": "chat:message"
         }
@@ -4644,7 +4759,7 @@
       ]
     },
     "381295737977307137": {
-      "xp": 45,
+      "xp": 135,
       "awards": [
         {
           "ts": "2025-11-05T12:29:52.077269+00:00",
@@ -4660,11 +4775,41 @@
           "ts": "2025-11-05T12:29:52.984250+00:00",
           "amount": 15,
           "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-05T15:40:36.822901+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-05T15:40:36.862969+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-05T15:40:37.486412+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-05T15:40:37.945243+00:00",
+          "amount": 15,
+          "reason": "shadow_exposure"
+        },
+        {
+          "ts": "2025-11-05T15:40:37.977308+00:00",
+          "amount": 15,
+          "reason": "shadow_exposure"
+        },
+        {
+          "ts": "2025-11-05T15:40:38.380179+00:00",
+          "amount": 15,
+          "reason": "shadow_exposure"
         }
       ]
     },
     "yuuki_niiyan": {
-      "xp": 30,
+      "xp": 60,
       "awards": [
         {
           "ts": "2025-11-05T12:29:53.011818+00:00",
@@ -4675,6 +4820,116 @@
           "ts": "2025-11-05T12:29:53.042447+00:00",
           "amount": 15,
           "reason": "chat:message"
+        },
+        {
+          "ts": "2025-11-05T15:40:37.516550+00:00",
+          "amount": 15,
+          "reason": "chat:message"
+        },
+        {
+          "ts": "2025-11-05T15:40:37.546166+00:00",
+          "amount": 15,
+          "reason": "chat:message"
+        }
+      ]
+    },
+    "710797698982215790": {
+      "xp": 90,
+      "awards": [
+        {
+          "ts": "2025-11-05T15:40:08.487917+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-05T15:40:08.524116+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-05T15:40:08.932933+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-05T15:40:09.592992+00:00",
+          "amount": 15,
+          "reason": "shadow_exposure"
+        },
+        {
+          "ts": "2025-11-05T15:40:09.625410+00:00",
+          "amount": 15,
+          "reason": "shadow_exposure"
+        },
+        {
+          "ts": "2025-11-05T15:40:10.263212+00:00",
+          "amount": 15,
+          "reason": "shadow_exposure"
+        }
+      ]
+    },
+    "www4869": {
+      "xp": 30,
+      "awards": [
+        {
+          "ts": "2025-11-05T15:40:08.960602+00:00",
+          "amount": 15,
+          "reason": "chat:message"
+        },
+        {
+          "ts": "2025-11-05T15:40:08.991758+00:00",
+          "amount": 15,
+          "reason": "chat:message"
+        }
+      ]
+    },
+    "1208490849533431861": {
+      "xp": 90,
+      "awards": [
+        {
+          "ts": "2025-11-05T15:47:22.340656+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-05T15:47:22.376266+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-05T15:47:22.762427+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-05T15:47:23.200956+00:00",
+          "amount": 15,
+          "reason": "shadow_exposure"
+        },
+        {
+          "ts": "2025-11-05T15:47:23.225362+00:00",
+          "amount": 15,
+          "reason": "shadow_exposure"
+        },
+        {
+          "ts": "2025-11-05T15:47:23.609011+00:00",
+          "amount": 15,
+          "reason": "shadow_exposure"
+        }
+      ]
+    },
+    "bayu0553": {
+      "xp": 30,
+      "awards": [
+        {
+          "ts": "2025-11-05T15:47:22.783634+00:00",
+          "amount": 15,
+          "reason": "chat:message"
+        },
+        {
+          "ts": "2025-11-05T15:47:22.808328+00:00",
+          "amount": 15,
+          "reason": "chat:message"
         }
       ]
     }
@@ -4683,6 +4938,6 @@
     "total_awards": 8,
     "total_users": 1
   },
-  "updated_at": "2025-11-05T12:29:53.042447+00:00",
+  "updated_at": "2025-11-05T15:47:23.609011+00:00",
   "awards": {}
 }

@@ -23,7 +23,7 @@ class SeniorTotalSanitizeOnce(commands.Cog):
             kv = PinnedJSONKV(self.bot)
             us = UpstashClient()
             try:
-                cur = await us.cmd("GET", self.total_key)
+                cur = await us.get_raw(self.total_key)
             except Exception as e:
                 log.debug("[total-sanitize] GET failed: %r", e)
                 cur = None
@@ -37,7 +37,7 @@ class SeniorTotalSanitizeOnce(commands.Cog):
             else:
                 val = 0
             try:
-                await us.cmd("SET", self.total_key, str(val))
+                await us.set(self.total_key, str(val))
                 log.warning("[total-sanitize] fixed %s -> %s", self.total_key, val)
             except Exception as e:
                 log.debug("[total-sanitize] SET failed: %r", e)

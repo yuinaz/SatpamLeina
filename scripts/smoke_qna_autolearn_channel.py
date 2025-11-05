@@ -180,7 +180,7 @@ def run_channel_flow_check(channel_id, timeout_sec=45):
     smoke = f"smoke:{uuid.uuid4().hex[:8]}"
     prompt = "Sebutkan satu fakta singkat tentang kopi. Jawab ringkas (≤20 kata)."
     try:
-        _discord_send_embed(tok, channel_id, "Question by Leina", f"{prompt}\n\n_{smoke}_", smoke)
+        _discord_send_embed(tok, channel_id, "Question by Leina", prompt, smoke)
     except Exception as e:
         print(f"[CHANNEL] FAIL: cannot POST question -> {e}")
         return (False, None)

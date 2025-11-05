@@ -94,7 +94,7 @@ class _Sanitizer:
 
 class LockLearningStatusOverlay(commands.Cog):
     """Global guard that sanitizes *any* writes to learning:status/_json to KULIAH/MAGANG from pinned stage.
-    Hooks both PinnedJSONKV.set_multi and UpstashClient.cmd('SET', ...).
+    Hooks both PinnedJSONKV.set_multi and UpstashClient.set(...).
     """
     def __init__(self, bot):
         self.bot = bot

@@ -50,11 +50,11 @@ class LearningStatusUpstashEnforcerOverlay(commands.Cog):
 
             # Read current Upstash values
             try:
-                cur_status = await us.cmd("GET", "learning:status")
+                cur_status = await us.get_raw("learning:status")
             except Exception:
                 cur_status = None
             try:
-                cur_status_json = await us.cmd("GET", "learning:status_json")
+                cur_status_json = await us.get_raw("learning:status_json")
             except Exception:
                 cur_status_json = None
 
@@ -68,7 +68,7 @@ class LearningStatusUpstashEnforcerOverlay(commands.Cog):
                 # Write to Upstash and pinned KV (for consistency)
                 for k, v in writes.items():
                     try:
-                        await us.cmd("SET", k, v)
+                        await us.set(k, v)
                     except Exception as e:
                         log.warning("[learning-enforcer] upstash set %s failed: %r", k, e)
                 await kv.set_multi(writes)
