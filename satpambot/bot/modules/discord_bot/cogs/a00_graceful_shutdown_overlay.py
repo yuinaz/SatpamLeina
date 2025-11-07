@@ -1,38 +1,24 @@
 from __future__ import annotations
-import asyncio, signal, logging
+import asyncio, logging, os, signal, sys
 from discord.ext import commands
 log = logging.getLogger(__name__)
+HARD_KILL_SEC = int(os.getenv("SHUTDOWN_HARD_KILL_SEC","6") or "6")
 class GracefulShutdownOverlay(commands.Cog):
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
-        self._armed = False
-        self._install()
-    def _install(self):
-        loop = None
-        try:
-            loop = asyncio.get_running_loop()
-        except Exception:
-            pass
-        # SIGINT (Ctrl+C) always available; SIGTERM not on Windows
-        def _handle_sig(signame):
-            log.warning("[shutdown] got %s -> closing bot gracefully...", signame)
-            try:
-                asyncio.create_task(self.bot.close())
-            except Exception:
-                # last resort: stop loop
-                try:
-                    loop = asyncio.get_event_loop()
-                    loop.stop()
-                except Exception:
-                    pass
-        for sig in ("SIGINT","SIGTERM"):
-            if hasattr(signal, sig):
-                try:
-                    signal.signal(getattr(signal, sig), lambda *_: _handle_sig(sig))
-                    self._armed = True
-                except Exception:
-                    pass
-        if self._armed:
-            log.info("[shutdown] signal handlers armed (Ctrl+C/SIGTERM)")
-async def setup(bot: commands.Bot):
-    await bot.add_cog(GracefulShutdownOverlay(bot))
+    def __init__(self, bot): self.bot=bot; self._arm()
+    def _arm(self):
+        def handle(sig): 
+            log.info("[shutdown] starting graceful shutdown (%s) ...", sig)
+            asyncio.create_task(self._shutdown())
+        for s in ("SIGINT","SIGTERM"):
+            if hasattr(signal, s):
+                try: signal.signal(getattr(signal,s), lambda *_: handle(s))
+                except Exception: pass
+        log.info("[shutdown] signal handlers armed")
+    async def _shutdown(self):
+        try: await asyncio.wait_for(self.bot.close(), timeout=HARD_KILL_SEC)
+        except Exception as e: log.warning("[shutdown] bot.close err: %s", e)
+        try: asyncio.get_event_loop().stop()
+        except Exception: pass
+        try: os._exit(0)
+        except Exception: sys.exit(0)
+async def setup(bot): await bot.add_cog(GracefulShutdownOverlay(bot))

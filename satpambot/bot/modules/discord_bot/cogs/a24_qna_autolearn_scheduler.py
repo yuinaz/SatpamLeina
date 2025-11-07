@@ -13,10 +13,17 @@ else:
 
 log = logging.getLogger(__name__)
 
-ENABLE = os.getenv("QNA_AUTOLEARN_ENABLE", "0") == "1"
-TOPICS_PATH = os.getenv("QNA_TOPICS_PATH", "data/config/qna_topics.json")
+def _enabled() -> bool:
+    # accept either flag; prefer QNA_AUTOLEARN_ENABLE
+    return (os.getenv("QNA_AUTOLEARN_ENABLE","0") == "1") or (os.getenv("QNA_AUTOPILOT_ENABLE","0") == "1") or (os.getenv("QNA_AUTOPILOT","0") == "1")
+TOPICS_PATH = os.getenv("QNA_TOPICS_PATH") or os.getenv("QNA_TOPICS_FILE", "data/config/qna_topics.json")
 PERIOD = int(os.getenv("QNA_AUTOLEARN_PERIOD_SEC", "180"))  # 3 menit per permintaan user
-CHANNEL_ID = int(os.getenv("QNA_CHANNEL_ID", "0") or 0)     # channel isolasi untuk seed pertanyaan
+def _channel_id() -> int:
+    try:
+        return int(os.getenv("QNA_CHANNEL_ID") or os.getenv("LEARNING_QNA_CHANNEL_ID") or "0")
+    except Exception:
+        return 0
+# channel akan diambil saat run
 TITLE_ISO = os.getenv("QNA_TITLE_ISOLATION", "Question by Leina")
 TITLE_PUB = os.getenv("QNA_TITLE_PUBLIC", "Answer by Leina")
 
@@ -76,8 +83,8 @@ class QnAAutoLearnScheduler(commands.Cog):  # type: ignore[misc]
         self._topics: List[str] = []
 
     async def cog_load(self):
-        if not ENABLE:
-            log.info("[qna-autolearn] disabled")
+        if not _enabled():
+            log.info("[qna-autolearn] disabled (env)")
             return
         self._topics = _load_topics()
         if not self._topics:
@@ -85,7 +92,7 @@ class QnAAutoLearnScheduler(commands.Cog):  # type: ignore[misc]
             return
         self._task = self.bot.loop.create_task(self._runner(), name="qna_autolearn")
         log.info("[qna-autolearn] started: %s topics | interval=%ss | chan=%s",
-                 len(self._topics), PERIOD, CHANNEL_ID or "auto")
+                 len(self._topics), PERIOD, _channel_id() or "auto")
 
     async def cog_unload(self):
         if self._task and not self._task.done():
@@ -134,10 +141,11 @@ class QnAAutoLearnScheduler(commands.Cog):  # type: ignore[misc]
         if not topic:
             return
         # Prefer isolation channel if provided; otherwise skip quietly
-        if not CHANNEL_ID:
+        cid = _channel_id()
+        if not cid:
             log.warning("[qna-autolearn] CHANNEL_ID not set; skip post")
             return
-        ch = await self._resolve_channel(CHANNEL_ID)
+        ch = await self._resolve_channel(cid)
         if not ch:
             log.warning("[qna-autolearn] channel not found: %s", CHANNEL_ID)
             return

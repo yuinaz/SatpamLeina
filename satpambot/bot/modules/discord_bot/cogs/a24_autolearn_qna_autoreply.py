@@ -1,183 +1,133 @@
-from discord.ext import commands
-import os, asyncio, logging, random, json, hashlib, time, re
+from __future__ import annotations
+import os, json, random, logging, asyncio
+from pathlib import Path
 import discord
 from discord.ext import commands, tasks
-from urllib.parse import quote as _q
-
-try:
-    import httpx
-except Exception:
-    httpx = None
 
 log = logging.getLogger(__name__)
 
-QNA_CHANNEL_ID = int(os.getenv("QNA_CHANNEL_ID") or 0) or 1426571542627614772
-ASK_INTERVAL_MIN = int(os.getenv("QNA_AUTOASK_INTERVAL_MIN", "7"))
-DEDUP_TTL_SEC = int(os.getenv("QNA_ASK_DEDUP_TTL_SEC", "259200"))
-RECENT_MAX = int(os.getenv("QNA_ASK_RECENT_MAX", "200"))
-QNA_TOPICS_FILE = os.getenv("QNA_TOPICS_FILE", "data/config/qna_topics.json")
-QNA_TOPICS_JSON = os.getenv("QNA_TOPICS_JSON", "")
-PROVIDER_ORDER = [s.strip() for s in (os.getenv("QNA_PROVIDER_ORDER") or "groq,gemini").split(",") if s.strip()]
+# ---------------- Env helpers ----------------
+def _ebool(k: str, d: bool=False) -> bool:
+    v = os.getenv(k)
+    if v is None or v == "":
+        return d
+    return str(v).lower() in ("1","true","yes","on")
 
-UPSTASH_URL = os.getenv("UPSTASH_REDIS_REST_URL")
-UPSTASH_TOKEN = os.getenv("UPSTASH_REDIS_REST_TOKEN")
-UPSTASH_NS = os.getenv("QNA_ASK_DEDUP_NS", "qna:recent")
-
-AUTOREPLY_SEED_ENABLE = os.getenv("QNA_AUTOREPLY_SEED_ENABLE", "0") == "1"
-SEED_GATE_KEY = os.getenv("QNA_SEED_GATE_KEY", "qna:seed:gate")
-SEED_GATE_TTL_SEC = int(os.getenv("QNA_SEED_GATE_TTL_SEC", "90"))
-
-DEFAULT_POOLS = {
-    "game": ["Bagaimana live-ops ala game Korea menjaga retensi tanpa terasa pay-to-win?"],
-    "ai": ["Praktik aman memakai AI generatif dalam komunitas online?"],
-    "musik": ["Bagaimana K-pop mendesain hook 15 detik yang efektif di short-video?"],
-}
-
-def _normalize(text: str) -> str:
-    t = text.strip().lower()
-    t = re.sub(r"\s+", " ", t)
-    return t
-
-def _hash(text: str) -> str:
-    return hashlib.sha1(_normalize(text).encode()).hexdigest()
-
-async def _upstash_get(client, key):
-    if not (UPSTASH_URL and UPSTASH_TOKEN and client): return None
+def _eint(k: str, d: int) -> int:
     try:
-        r = await client.get(f"{UPSTASH_URL}/get/{_q(key, safe='')}", headers={"Authorization": f"Bearer {UPSTASH_TOKEN}"}, timeout=8.0)
-        if r.status_code == 200:
-            return (r.json() or {}).get("result")
+        return int(os.getenv(k, str(d)) or d)
     except Exception:
-        pass
-    return None
+        return d
 
-async def _upstash_setex(client, key, ttl, val):
-    if not (UPSTASH_URL and UPSTASH_TOKEN and client): return False
+def _channel_id() -> int:
     try:
-        r = await client.post(f"{UPSTASH_URL}/setex/{_q(key,safe='')}/{ttl}/{_q(val,safe='')}", headers={"Authorization": f"Bearer {UPSTASH_TOKEN}"}, timeout=8.0)
-        return r.status_code == 200
+        return int(os.getenv("QNA_CHANNEL_ID") or os.getenv("LEARNING_QNA_CHANNEL_ID") or "0")
     except Exception:
-        return False
+        return 0
 
-async def _llm_generate(topic: str) -> str:
+def _topics_path() -> Path:
+    # Accept both QNA_TOPICS_FILE and QNA_TOPICS_PATH; default to repo data file
+    p = os.getenv("QNA_TOPICS_FILE") or os.getenv("QNA_TOPICS_PATH") or "data/config/qna_topics.json"
+    path = Path(p)
+    if not path.exists():
+        # try satpambot/ prefix if running from repo root
+        alt = Path("satpambot")/p
+        if alt.exists():
+            path = alt
+    return path
+
+def _enabled() -> bool:
+    # runtime check each tick
+    return _ebool("QNA_AUTOREPLY_SEED_ENABLE", False)
+
+# ---------------- Topics loader ----------------
+def _load_topics() -> list[str]:
+    path = _topics_path()
     try:
-        from ....providers.llm_facade import ask as llm_ask
-    except Exception:
-        llm_ask = None
-    prompt = "Buat SATU pertanyaan singkat, sopan, netral, aman, berakhir '?'. Topik: " + topic
-    if llm_ask:
-        for prov in PROVIDER_ORDER:
-            try:
-                txt = await llm_ask(provider=prov, model=os.getenv('GROQ_MODEL') if prov=='groq' else os.getenv('GEMINI_MODEL'),
-                                    system='Jawab satu kalimat tanya saja.', messages=[{'role':'user','content': prompt}],
-                                    temperature=0.8, max_tokens=48)
-                if txt and txt.strip().endswith('?') and len(_normalize(txt)) >= 12:
-                    return txt.strip()
-            except Exception:
-                continue
-    pool = DEFAULT_POOLS.get(topic, [])
-    return random.choice(pool) if pool else "Apa yang sedang kamu pikirkan sekarang?"
+        if path.exists():
+            text = path.read_text(encoding="utf-8")
+            data = json.loads(text)
+            if isinstance(data, list):
+                return [str(x).strip() for x in data if str(x).strip()]
+            if isinstance(data, dict):
+                # prefer 'topics' or 'questions' keys
+                for k in ("topics","questions","items"):
+                    if k in data and isinstance(data[k], list):
+                        return [str(x).strip() for x in data[k] if str(x).strip()]
+    except Exception as e:
+        log.warning("[qna-autoask] topics load failed from %s: %s", path, e)
+    # fallback minimal pool
+    return [
+        "Sebutkan satu fakta singkat tentang kopi. Jawab ringkas (≤20 kata).",
+        "Berikan 1 tips produktivitas singkat. Maks 1 kalimat.",
+        "Apa satu fakta sains acak? Maks 20 kata."
+    ]
 
-class AutoAskQnA(commands.Cog):
-    def __init__(self, bot):
+def _pick_topic() -> str:
+    pool = _load_topics()
+    try:
+        return random.choice(pool)
+    except Exception:
+        return pool[0]
+
+# ---------------- Cog ----------------
+class QnaAutolearnAutoReply(commands.Cog):
+    """Seeder QnA: mengirim 'Question by Leina' ke channel isolasi secara berkala.
+    Aman untuk runtime: tidak crash meski env belum lengkap; patuh ENABLE setiap tick.
+    """
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.recent = []
-        self._client = httpx.AsyncClient() if httpx else None
-        self.topics = self._load_topics()
-        self._last_topic = None
-        self._mem_gate_until = 0
-        if AUTOREPLY_SEED_ENABLE:
-            self.loop.start()
-            log.info("[qna-autoask] enabled (interval=%s mnt, chan=%s)", ASK_INTERVAL_MIN, QNA_CHANNEL_ID)
-        else:
-            log.info("[qna-autoask] disabled by QNA_AUTOREPLY_SEED_ENABLE=0 (use scheduler as sole seeder)")
+        self._interval_min = max(_eint("QNA_SEED_INTERVAL_MIN", _eint("QNA_ASK_INTERVAL_MIN", 7)), 1)
+        # Loop pakai seconds agar bisa diubah saat runtime
+        self.loop.change_interval(minutes=self._interval_min)
 
-    def _load_topics(self):
-        if QNA_TOPICS_FILE and os.path.exists(QNA_TOPICS_FILE):
-            try:
-                with open(QNA_TOPICS_FILE, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                if isinstance(data, dict) and data:
-                    return data
-            except Exception as e:
-                log.warning("[qna-autoask] cannot load topics file %s: %r", QNA_TOPICS_FILE, e)
-        if QNA_TOPICS_JSON:
-            try:
-                data = json.loads(QNA_TOPICS_JSON)
-                if isinstance(data, dict) and data:
-                    return data
-            except Exception as e:
-                log.warning("[qna-autoask] invalid QNA_TOPICS_JSON: %r", e)
-        return DEFAULT_POOLS
-
-    def _remember(self, q: str):
-        h = _hash(q)
-        now = int(time.time())
-        self.recent.append((h, now))
-        self.recent = [(hh,ts) for hh,ts in self.recent if now-ts < DEDUP_TTL_SEC][-RECENT_MAX:]
-        return h
-
-    async def _seed_gate_active(self) -> bool:
-        now = int(time.time())
-        if now < self._mem_gate_until:
-            return True
-        if self._client and UPSTASH_URL and UPSTASH_TOKEN:
-            try:
-                val = await _upstash_get(self._client, SEED_GATE_KEY)
-                if val is not None:
-                    return True
-            except Exception:
-                pass
-        return False
-
-    async def _activate_seed_gate(self):
-        until = int(time.time()) + SEED_GATE_TTL_SEC
-        self._mem_gate_until = until
-        if self._client and UPSTASH_URL and UPSTASH_TOKEN:
-            try:
-                await _upstash_setex(self._client, SEED_GATE_KEY, SEED_GATE_TTL_SEC, str(until))
-            except Exception:
-                pass
-
-    def _pick_topic(self) -> str:
-        keys = list(self.topics.keys())
-        if not keys:
-            return "global"
-        if self._last_topic and len(keys) > 1 and self._last_topic in keys:
-            alt = [k for k in keys if k != self._last_topic]
-            topic = random.choice(alt)
-        else:
-            topic = random.choice(keys)
-        self._last_topic = topic
-        return topic
-
-    @tasks.loop(minutes=ASK_INTERVAL_MIN)
+    @tasks.loop(seconds=30.0)
     async def loop(self):
-        if not AUTOREPLY_SEED_ENABLE:
+        # Gate by runtime enable
+        if not _enabled():
             return
-        try:
-            ch = self.bot.get_channel(QNA_CHANNEL_ID)
-            if not ch:
-                log.warning("[qna-autoask] channel not found: %s", QNA_CHANNEL_ID)
-                return
-            if await self._seed_gate_active():
-                log.debug("[qna-autoask] seed gate active; skip tick")
-                return
-            topic = self._pick_topic()
-            q = await _llm_generate(topic)
-            h = self._remember(q)
-            if self._client and UPSTASH_URL and UPSTASH_TOKEN:
-                await _upstash_setex(self._client, f"{UPSTASH_NS}:{h}", DEDUP_TTL_SEC, str(int(time.time())))
-            await self._activate_seed_gate()
-            emb = discord.Embed(title="Question by Leina", description=q)
-            await ch.send(embed=emb)
-            log.info("[qna-autoask] posted seed -> %s", q[:80])
-        except Exception as e:
-            log.warning("[qna-autoask] %r", e)
+        cid = _channel_id()
+        if not cid:
+            log.warning("[qna-autoask] QNA_CHANNEL_ID not set; skip seeding")
+            return
 
-    @loop.before_loop
-    async def before(self):
-        await self.bot.wait_until_ready()
+        try:
+            await self.bot.wait_until_ready()
+            ch = self.bot.get_channel(cid)
+            if ch is None:
+                # Safe resolve via fetch_channel
+                try:
+                    ch = await self.bot.fetch_channel(cid)
+                except Exception:
+                    log.warning("[qna-autoask] channel %s not found; skip", cid)
+                    return
+
+            prompt = _pick_topic()
+            emb = discord.Embed(title="Question by Leina", description=prompt)
+            try:
+                emb.set_footer(text="seed:autoreply")
+            except Exception:
+                pass
+            await ch.send(embed=emb)
+            log.info("[qna-autoask] seeded question to %s", cid)
+        except asyncio.CancelledError:
+            raise
+        except Exception:
+            log.exception("[qna-autoask] loop error")
+
+    async def cog_load(self):
+        # Always arm the loop; it will self-gate by ENABLE
+        if not self.loop.is_running():
+            self.loop.start()
+        log.info("[qna-autoask] armed (interval=%s min) enable_runtime=%s chan=%s topics=%s",
+                 self._interval_min, _enabled(), _channel_id(), _topics_path())
+
+    async def cog_unload(self):
+        try:
+            if self.loop.is_running():
+                self.loop.cancel()
+        except Exception:
+            pass
 
 async def setup(bot: commands.Bot):
-    await bot.add_cog(AutoAskQnA(bot))
+    await bot.add_cog(QnaAutolearnAutoReply(bot))
