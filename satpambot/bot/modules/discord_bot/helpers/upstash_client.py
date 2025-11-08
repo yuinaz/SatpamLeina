@@ -35,6 +35,9 @@ class UpstashClient:
         log.info("[upstash-client] enabled=%s url=%s", self.enabled, ("..."+self.url[-24:] if self.url else ""))
 
     async def _aget(self, path: str):
+        if os.getenv('LEINA_SHUTTING_DOWN') == '1':
+            log.warning('[upstash-client] skip (shutting down) GET %s', path)
+            return None
         if not self.enabled:
             return None
         target = f"{self.url}{path}"
@@ -53,6 +56,9 @@ class UpstashClient:
             return await asyncio.to_thread(_do)
 
     async def _apost(self, path: str):
+        if os.getenv('LEINA_SHUTTING_DOWN') == '1':
+            log.warning('[upstash-client] skip (shutting down) POST %s', path)
+            return None
         if not self.enabled:
             return None
         target = f"{self.url}{path}"

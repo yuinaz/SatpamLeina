@@ -39,12 +39,12 @@ except Exception:
 
 class ShadowLearningObserverOverlay(commands.Cog):
     """Award +15 XP per user exposure (cooldown per user), skip QNA & channels in SKIP_IDS.
-    This file name follows the a08*_*_overlay pattern so loader will pick it up.
+    Award XP in **all** channels (no auto-skip for QNA).
     """
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self._last_award: Dict[int, float] = {}
-        log.info("[shadow-observer] armed: enable=%s xp=%s cooldown=%ss skip=%s",
+        log.info("[shadow-observer] armed: enable=%s xp=%s cooldown=%ss skip=%s (explicit only)",
                  ENABLE, PER_EXPOSURE_XP, USER_COOLDOWN_SEC, sorted(SKIP_IDS) if SKIP_IDS else "-")
 
     def _cooldown_ok(self, uid: int) -> bool:
@@ -83,3 +83,22 @@ class ShadowLearningObserverOverlay(commands.Cog):
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(ShadowLearningObserverOverlay(bot))
+
+# --- LEINA PATCH: allow award in QNA channel (explicit-only skip) ---
+try:
+    import os
+    _qna = int(os.getenv('QNA_CHANNEL_ID','0'))
+    if _qna:
+        for _n in ['SKIP','SKIP_IDS','SKIP_CHANNELS']:
+            if _n in globals():
+                _s = globals()[_n]
+                try:
+                    _s.discard(_qna)
+                except Exception:
+                    try:
+                        if _qna in _s: del _s[_qna]
+                    except Exception:
+                        pass
+except Exception:
+    pass
+# --- /LEINA PATCH ---

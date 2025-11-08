@@ -35,9 +35,7 @@ ENABLE = _ebool("SHADOW_ENABLE", True)
 
 SKIP = _ids(os.getenv("SHADOW_SKIP_IDS", "")) | _ids(os.getenv("LEARNING_SKIP_CHANNEL_IDS", ""))
 try:
-    qna = int(os.getenv("LEARNING_QNA_CHANNEL_ID", os.getenv("QNA_CHANNEL_ID", "0")) or "0")  # type: ignore
-    if qna:
-        SKIP.add(qna)
+    pass
 except Exception:
     pass
 
@@ -83,3 +81,22 @@ class ShadowLearningObserverOverlay(commands.Cog):
 
 async def setup(bot):
     await bot.add_cog(ShadowLearningObserverOverlay(bot))
+
+# --- LEINA PATCH: allow award in QNA channel (explicit-only skip) ---
+try:
+    import os
+    _qna = int(os.getenv('QNA_CHANNEL_ID','0'))
+    if _qna:
+        for _n in ['SKIP','SKIP_IDS','SKIP_CHANNELS']:
+            if _n in globals():
+                _s = globals()[_n]
+                try:
+                    _s.discard(_qna)
+                except Exception:
+                    try:
+                        if _qna in _s: del _s[_qna]
+                    except Exception:
+                        pass
+except Exception:
+    pass
+# --- /LEINA PATCH ---

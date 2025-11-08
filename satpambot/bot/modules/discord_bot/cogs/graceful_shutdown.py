@@ -12,6 +12,7 @@ import logging
 import signal
 import sys
 import atexit
+import os
 from typing import Optional
 
 import discord
@@ -53,6 +54,7 @@ class GracefulShutdown(commands.Cog):
             self._sync_finalizer()
 
     async def shutdown(self, reason: str = "unknown"):
+        os.environ['LEINA_SHUTTING_DOWN']='1'
         if self._shutdown_started:
             return
         self._shutdown_started = True

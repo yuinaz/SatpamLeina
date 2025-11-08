@@ -8,6 +8,8 @@ class GracefulShutdownOverlay(commands.Cog):
     def _arm(self):
         def handle(sig): 
             log.info("[shutdown] starting graceful shutdown (%s) ...", sig)
+            import os
+            os.environ['LEINA_SHUTTING_DOWN']='1'
             asyncio.create_task(self._shutdown())
         for s in ("SIGINT","SIGTERM"):
             if hasattr(signal, s):
