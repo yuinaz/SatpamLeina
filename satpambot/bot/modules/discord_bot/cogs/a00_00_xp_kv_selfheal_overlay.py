@@ -93,7 +93,11 @@ class XpKvSelfhealOverlay(commands.Cog):
 
     @tasks.loop(seconds=INTERVAL)
     async def task(self):
-        # never block the event loop if network is slow
+        
+        import os
+        if os.getenv('LEINA_SHUTTING_DOWN') == '1':
+            return None
+# never block the event loop if network is slow
         try:
             vals = await _fetch_upstash(_KEYS)
             fixes: Dict[str, Any] = {}
@@ -127,3 +131,7 @@ async def setup(bot):
         await bot.add_cog(XpKvSelfhealOverlay(bot))
     except Exception as e:
         log.info("[xp-kv-selfheal] setup swallowed: %r", e)
+
+    def cog_unload(self):
+        try: self.task.cancel()
+        except Exception: pass

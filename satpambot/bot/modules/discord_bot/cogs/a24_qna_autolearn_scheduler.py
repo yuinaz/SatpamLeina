@@ -26,6 +26,7 @@ def _channel_id() -> int:
 # channel akan diambil saat run
 TITLE_ISO = os.getenv("QNA_TITLE_ISOLATION", "Question by Leina")
 TITLE_PUB = os.getenv("QNA_TITLE_PUBLIC", "Answer by Leina")
+TITLE_ASK = os.getenv("QNA_EMBED_TITLE_LEINA", os.getenv("QNA_TITLE_ISOLATION", "Question by Leina"))
 
 def _flatten_topics(data: Any) -> List[str]:
     topics: List[str] = []
@@ -151,7 +152,7 @@ class QnAAutoLearnScheduler(commands.Cog):  # type: ignore[misc]
             return
         # Simple seed embed (title uses isolation title)
         import discord
-        emb = discord.Embed(title=TITLE_ISO, description=topic)
+        emb = discord.Embed(title=TITLE_ASK, description=topic)
         await ch.send(embed=emb)
         log.info("[qna-autolearn] posted seed -> %s", topic[:80])
 

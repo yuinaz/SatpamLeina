@@ -32,9 +32,10 @@ class UpstashClient:
             self._httpx = httpx
         except Exception:
             self._httpx = None
-        log.info("[upstash-client] enabled=%s url=%s", self.enabled, ("..."+self.url[-24:] if self.url else ""))
+        log.info("[upstash-client] enabled=%s url=%s", self.enabled, ("..." + self.url[-24:] if self.url else ""))
 
     async def _aget(self, path: str):
+        # Shutdown guard
         if os.getenv('LEINA_SHUTTING_DOWN') == '1':
             log.warning('[upstash-client] skip (shutting down) GET %s', path)
             return None
@@ -56,6 +57,7 @@ class UpstashClient:
             return await asyncio.to_thread(_do)
 
     async def _apost(self, path: str):
+        # Shutdown guard
         if os.getenv('LEINA_SHUTTING_DOWN') == '1':
             log.warning('[upstash-client] skip (shutting down) POST %s', path)
             return None
@@ -79,7 +81,8 @@ class UpstashClient:
     async def get_raw(self, key: str):
         try:
             d = await self._aget(f"/get/{key}")
-            if not isinstance(d, dict): return None
+            if not isinstance(d, dict):
+                return None
             return d.get("result")
         except Exception as e:
             log.debug("[upstash-client] get_raw fail: %r", e)

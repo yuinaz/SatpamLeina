@@ -1,0 +1,26 @@
+{
+  "env": {
+    "QNA_ENABLE": "1",
+    "QNA_CHANNEL_ID": "1426571542627614772",
+    "QNA_INTERVAL_SEC": "180",
+    "QNA_AUTOLEARN_ENABLE": "1",
+    "QNA_AUTOLEARN_PERIOD_SEC": "180",
+    "QNA_BOOT_KICK": "0",
+    "QNA_TITLE_ISOLATION": "Question by Leina",
+    "QNA_TITLE_PUBLIC": "Answer by Leina",
+    "QNA_EMBED_TITLE_LEINA": "Question by Leina",
+    "QNA_EMBED_TITLE_PROVIDER": "Answer by {provider}",
+    "QNA_PROVIDER_ORDER": "gemini,groq",
+    "QNA_FORCE_PROVIDER": "",
+    "QNA_STRICT_FORCE": "1",
+    "GEMINI_FORCE_DISABLE": "0",
+    "GROQ_FORCE_DISABLE": "0",
+    "LLM_GEMINI_MODEL": "gemini-2.5-flash-lite",
+    "LLM_GROQ_MODEL": "llama-3.1-8b-instant",
+    "SHADOW_ENABLE": "1",
+    "SHADOW_SKIP_IDS": "",
+    "LEARNING_SKIP_CHANNEL_IDS": "",
+    "DISABLE_DUPLICATE_QNA": "1",
+    "COGS_ALWAYS": ""
+  }
+}

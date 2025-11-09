@@ -81,3 +81,7 @@ class PresenceFromUpstash(commands.Cog):
         await self.bot.wait_until_ready()
 async def setup(bot: commands.Bot):
     await bot.add_cog(PresenceFromUpstash(bot))
+# LEINA_UPSTASH_SAFE: skip overlay if missing config
+import os as _os
+if not (_os.getenv('UPSTASH_URL') and _os.getenv('UPSTASH_TOKEN')):
+    ENABLE = False

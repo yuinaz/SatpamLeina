@@ -1564,7 +1564,7 @@
       ]
     },
     "897654545423945758": {
-      "xp": 165,
+      "xp": 495,
       "awards": [
         {
           "ts": "2025-10-29T10:56:44.631233+00:00",
@@ -1620,11 +1620,121 @@
           "ts": "2025-10-31T15:31:08.766521+00:00",
           "amount": 15,
           "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-08T16:55:24.155315+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-08T16:55:24.196360+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-08T16:55:24.451211+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-08T16:55:24.482204+00:00",
+          "amount": 15,
+          "reason": "shadow_exposure"
+        },
+        {
+          "ts": "2025-11-08T16:55:24.730031+00:00",
+          "amount": 15,
+          "reason": "shadow_exposure"
+        },
+        {
+          "ts": "2025-11-08T16:55:24.760036+00:00",
+          "amount": 15,
+          "reason": "shadow_exposure"
+        },
+        {
+          "ts": "2025-11-08T16:55:24.795056+00:00",
+          "amount": 15,
+          "reason": "force-include"
+        },
+        {
+          "ts": "2025-11-08T16:55:24.837556+00:00",
+          "amount": 15,
+          "reason": "force-include"
+        },
+        {
+          "ts": "2025-11-08T16:55:25.374100+00:00",
+          "amount": 15,
+          "reason": "shadow_exposure"
+        },
+        {
+          "ts": "2025-11-08T16:55:25.405031+00:00",
+          "amount": 15,
+          "reason": "shadow_exposure"
+        },
+        {
+          "ts": "2025-11-08T16:55:25.653466+00:00",
+          "amount": 15,
+          "reason": "shadow_exposure"
+        },
+        {
+          "ts": "2025-11-08T16:58:16.742840+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-08T16:58:16.782352+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-08T16:58:17.026597+00:00",
+          "amount": 15,
+          "reason": "passive_message"
+        },
+        {
+          "ts": "2025-11-08T16:58:17.059116+00:00",
+          "amount": 15,
+          "reason": "shadow_exposure"
+        },
+        {
+          "ts": "2025-11-08T16:58:17.303503+00:00",
+          "amount": 15,
+          "reason": "shadow_exposure"
+        },
+        {
+          "ts": "2025-11-08T16:58:17.333510+00:00",
+          "amount": 15,
+          "reason": "shadow_exposure"
+        },
+        {
+          "ts": "2025-11-08T16:58:17.366032+00:00",
+          "amount": 15,
+          "reason": "force-include"
+        },
+        {
+          "ts": "2025-11-08T16:58:17.408033+00:00",
+          "amount": 15,
+          "reason": "force-include"
+        },
+        {
+          "ts": "2025-11-08T16:58:17.922084+00:00",
+          "amount": 15,
+          "reason": "shadow_exposure"
+        },
+        {
+          "ts": "2025-11-08T16:58:17.953216+00:00",
+          "amount": 15,
+          "reason": "shadow_exposure"
+        },
+        {
+          "ts": "2025-11-08T16:58:18.207356+00:00",
+          "amount": 15,
+          "reason": "shadow_exposure"
         }
       ]
     },
     "terumi612": {
-      "xp": 90,
+      "xp": 150,
       "awards": [
         {
           "ts": "2025-10-29T10:56:45.533338+00:00",
@@ -1653,6 +1763,26 @@
         },
         {
           "ts": "2025-10-31T15:31:08.824177+00:00",
+          "amount": 15,
+          "reason": "chat:message"
+        },
+        {
+          "ts": "2025-11-08T16:55:25.094789+00:00",
+          "amount": 15,
+          "reason": "chat:message"
+        },
+        {
+          "ts": "2025-11-08T16:55:25.124329+00:00",
+          "amount": 15,
+          "reason": "chat:message"
+        },
+        {
+          "ts": "2025-11-08T16:58:17.649515+00:00",
+          "amount": 15,
+          "reason": "chat:message"
+        },
+        {
+          "ts": "2025-11-08T16:58:17.679605+00:00",
           "amount": 15,
           "reason": "chat:message"
         }
@@ -5568,6 +5698,6 @@
     "total_awards": 8,
     "total_users": 1
   },
-  "updated_at": "2025-11-07T15:57:33.307161+00:00",
+  "updated_at": "2025-11-08T16:58:18.207356+00:00",
   "awards": {}
 }

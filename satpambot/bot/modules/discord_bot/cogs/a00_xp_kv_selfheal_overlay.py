@@ -56,3 +56,5 @@ class XpKvSelfHeal(commands.Cog):
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(XpKvSelfHeal(bot))
+    def cog_unload(self):
+        pass

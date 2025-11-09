@@ -31,7 +31,7 @@
     "QNA_PROVIDER_ORDER": "gemini,groq",
     "QNA_RACE_DEADLINE": "12",
     "QNA_RACE_PROVIDER_TIMEOUT": "8",
-    "QNA_TITLE_ISOLATION": "Answer by Leina",
+    "QNA_TITLE_ISOLATION": "Question by Leina",
     "QNA_TITLE_PUBLIC": "Answer by Leina",
     "QNA_TYPING_MODE": "short",
     "QNA_XP_PER_ANSWER_BOT": "30",
@@ -458,8 +458,12 @@
     "XP_STAGE_STRICT_EDIT_ONLY": "1",
     "LEINA_DISABLE_GRACEFUL_SHUTDOWN": "1",
     "QNA_EMBED_TITLE_PROVIDER": "Answer by {provider}",
-    "QNA_EMBED_TITLE_LEINA": "Answer by Leina",
+    "QNA_EMBED_TITLE_LEINA": "Question by Leina",
     "SHADOW_SKIP_IDS": "",
-    "LEARNING_SKIP_CHANNEL_IDS": ""
+    "LEARNING_SKIP_CHANNEL_IDS": "",
+    "QNA_FORCE_PROVIDER": "",
+    "QNA_STRICT_FORCE": "1",
+    "GEMINI_FORCE_DISABLE": "0",
+    "GROQ_FORCE_DISABLE": "0"
   }
 }

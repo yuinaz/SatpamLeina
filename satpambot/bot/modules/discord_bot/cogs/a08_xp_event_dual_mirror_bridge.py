@@ -165,3 +165,18 @@ class XPEventDualMirrorBridge(commands.Cog):
 async def setup(bot: commands.Bot):
     if not ENABLE or SMOKE_MODE: log.info("[xp-mirror] loaded but disabled")
     await bot.add_cog(XPEventDualMirrorBridge(bot))
+
+
+async def _leina_safe_pins(ch, log=None):
+    try:
+        return await _leina_safe_pins(ch, log)
+    except Exception as e:
+        status = getattr(e, 'status', None)
+        name = getattr(getattr(e, '__class__', None), '__name__', 'Exception')
+        if status == 403 or name in ('Forbidden',):
+            if log:
+                cid = getattr(ch, 'id', '?')
+                log.warning('[xp-mirror] pin fetch forbidden ch=%s (50001) → skip', cid)
+            return []
+        if log: log.warning('[xp-mirror] pin fetch failed: %r', e)
+        return []

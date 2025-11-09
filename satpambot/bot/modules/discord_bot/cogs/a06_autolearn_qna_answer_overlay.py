@@ -72,9 +72,13 @@ class QnAAutoLearnAnswerOverlay(commands.Cog):
 
             text, provider = await _provider_answer(prompt)
 
-            emb2 = discord.Embed(title="Answer", description=text)
+            from satpambot.bot.modules.discord_bot.helpers.confreader import cfg_str as _cfg
+            _title = str(_cfg("QNA_EMBED_TITLE_PROVIDER","Answer by {provider}")).format(provider=provider or "Leina")
+            from satpambot.bot.modules.discord_bot.helpers.confreader import cfg_str as _cfg
+            _title = str(_cfg("QNA_EMBED_TITLE_PROVIDER","Answer by {provider}")).format(provider=provider or "Leina")
+            emb2 = discord.Embed(title=_title, description=text)
             if provider:
-                emb2.set_footer(text=f"Answer by {provider}")
+                emb2.set_footer(text=f"[QNA][PROVIDER:{provider}]")
             await msg.channel.send(embed=emb2)
         except Exception as e:
             log.warning("[qna-answer] fail: %r", e)
