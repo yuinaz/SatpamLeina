@@ -1,0 +1,42 @@
+/*=== login ui patch ===*/
+:root{
+  --card-bg: rgba(17,24,39,.65);
+  --card-radius: 14px;
+  --input-h: 44px;
+}
+.login-card{
+  background: var(--card-bg);
+  border-radius: var(--card-radius);
+  padding: 20px 24px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.35);
+  max-width: 780px;
+  margin: 24px auto;
+}
+.login-card h1,.login-card h2{
+  margin: 6px 0 14px;
+  text-align: left;
+  font-weight: 700;
+}
+.brand-logo{
+  display:block; margin:0 auto 10px; height:44px; opacity:.95;
+}
+.form-row{ max-width: 720px; margin: 0 auto 12px; }
+.form-row label{ display:block; margin:.35rem 0 .25rem; opacity:.85 }
+.login-form input[type="text"],
+.login-form input[type="password"],
+form[action="/login"] input[type="text"],
+form[action="/login"] input[type="password"],
+form#login input[type="text"],
+form#login input[type="password"]{
+  display:block; width:100%; height:var(--input-h);
+  box-sizing:border-box; padding:.6rem .8rem;
+  border-radius:12px; border:1px solid rgba(255,255,255,.08);
+  background:rgba(0,0,0,.35); color:#fff; outline:none;
+}
+.login-btn,.btn-primary{
+  display:block; width:100%; height:var(--input-h);
+  border-radius:12px; border:0; cursor:pointer;
+  background:#1a56db; color:#fff; font-weight:600;
+}
+/* Particle background visibility */
+.particles-js-canvas-el{ opacity:.35 !important; pointer-events:none }

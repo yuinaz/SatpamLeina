@@ -1,0 +1,78 @@
+
+:root{
+  --bg: #0d1016;
+  --card-bg: rgba(22,26,34,0.85);
+  --card-border: rgba(255,255,255,0.05);
+  --text: #e9eefc;
+  --muted: #a8b3cf;
+  --primary: #1967ff;
+  --primary-2: #0a56ee;
+  --radius: 16px;
+  --shadow: 0 20px 45px rgba(0,0,0,.45);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body.login-page{
+  margin:0;
+  background: radial-gradient(1200px 800px at 10% 10%, #152032, transparent 60%),
+              radial-gradient(1200px 800px at 90% 90%, #312545, transparent 60%),
+              var(--bg);
+  color:var(--text);
+  font: 16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+  display:flex; align-items:center; justify-content:center;
+  min-height:100vh;
+}
+
+.login-wrap{ width: 100%; padding: 32px; display:flex; flex-direction:column; align-items:center; gap:18px;}
+.brand img{ width:72px; height:72px; filter: drop-shadow(0 6px 14px rgba(0,0,0,.5)); }
+
+.login-card{
+  width: min(520px, 92vw);
+  background: var(--card-bg);
+  border:1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 28px 28px 24px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(8px);
+}
+
+.title{ margin: 0 0 14px; font-size: 28px; letter-spacing:.3px }
+
+.alert{
+  background: rgba(255,100,100,.1);
+  color: #ffb4b4;
+  border:1px solid rgba(255,100,100,.25);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 6px 0 14px;
+  font-size: 14px;
+}
+
+.field{
+  display:flex; align-items:center; gap:10px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+.field .icon img{ width:18px; height:18px; opacity:.9 }
+.control{
+  appearance:none; border:none; outline:none;
+  background: transparent; color: var(--text);
+  font-size:15px; width:100%;
+  padding: 6px 2px;
+}
+.control::placeholder{ color: var(--muted) }
+
+.btn{
+  width:100%; border:none; outline:none;
+  background: linear-gradient(180deg, var(--primary), var(--primary-2));
+  color:white; font-weight:700; letter-spacing:.6px;
+  border-radius:12px; padding: 12px 14px; margin-top:6px;
+  cursor:pointer; box-shadow: 0 8px 20px rgba(25,103,255,.35);
+}
+.btn:hover{ filter: brightness(1.06) }
+.btn:active{ transform: translateY(1px) }

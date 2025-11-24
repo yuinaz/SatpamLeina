@@ -1,0 +1,20 @@
+{
+  "2025-W42": {
+    "scheduled_ts": 1760490900,
+    "triggered": false
+  },
+  "2025-W44": {
+    "scheduled_ts": 1761752700,
+    "triggered": true,
+    "award": 94,
+    "base": 94,
+    "weekend": false
+  },
+  "2025-W45": {
+    "scheduled_ts": 1762609500,
+    "triggered": true,
+    "award": 123,
+    "base": 41,
+    "weekend": true
+  }
+}

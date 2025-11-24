@@ -1,0 +1,19 @@
+{
+  "QNA_CHANNEL_ID": 1426571542627614772,
+  "QNA_MENTION_REQUIRED": true,
+  "QNA_PROVIDER_ORDER": [
+    "groq",
+    "gemini"
+  ],
+  "QNA_OWNER_BYPASS": true,
+  "STATUS_STICKY_PATTERNS": [
+    "(?i)^satpambot status$",
+    "(?i)^bot status$",
+    "(?i)^presence.*online",
+    "(?i)^imagephish.*",
+    "(?i)^phish.*",
+    "(?i)^phash.*",
+    "(?i)anti phishing discord guard"
+  ],
+  "NOTES": "Copy to data/local.json on both MiniPC and Render. Secrets stay in env."
+}

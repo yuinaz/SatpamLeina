@@ -1,0 +1,33 @@
+{% extends 'base.html
+{% block title %}📜 Logs{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="/dashboard" class="btn btn-outline-light">⬅️ Dashboard</a>
+    <h3>📜 Logs</h3>
+    <form class="d-flex" method="get">
+      <input class="form-control me-2" name="q" placeholder="Filter action/user/guild">
+      <button class="btn btn-primary">Cari</button>
+    </form>
+  </div>
+  <div class="card bg-dark text-light">
+    <div class="card-body table-responsive">
+      <table class="table table-dark table-sm align-middle">
+        <thead><tr><th>Waktu (UTC)</th><th>Aksi</th><th>User</th><th>Guild</th><th>Reason</th><th>Extra</th></tr></thead>
+        <tbody>
+        {% for it in rows %}
+          <tr>
+            <td>{{ it.ts }}</td>
+            <td>{{ it.action }}</td>
+            <td>{{ it.user_id }}</td>
+            <td>{{ it.guild_id }}</td>
+            <td>{{ it.reason }}</td>
+            <td><code style="white-space:pre-wrap">{{ it.extra }}</code></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{
+  "name": "satpambot-widget",
+  "version": "1.0.0",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "build:win": "electron-builder -w"
+  },
+  "dependencies": {
+    "electron": "^30.0.0",
+    "axios": "^1.6.7",
+    "electron-updater": "^6.1.8"
+  },
+  "devDependencies": {
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.satpambot.widget",
+    "productName": "SatpamBot Widget",
+    "win": {
+      "target": "nsis"
+    },
+    "directories": {
+      "output": "dist"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "<your-github>",
+        "repo": "<repo-name>"
+      }
+    ]
+  }
+}

@@ -1,0 +1,76 @@
+{% set active = active or "" %}
+<!doctype html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ title or "SatpamBot" }}</title>
+  <link rel="stylesheet" href="/dashboard-static/css/neo_aurora_plus.css">
+<link rel="stylesheet" href="/dashboard-static/css/hotfix_20250820.css">
+<link rel="stylesheet" href="/dashboard/dashboard-static/css/layout_compact.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <!-- Fallback logo tetap ada, tapi disembunyikan sampai ui-config ter-load -->
+      <img id="app-logo" src="/dashboard-static/logo.svg" alt="Logo" width="22" height="22"
+           style="opacity:.9;display:none">
+      <span id="app-title">SatpamBot</span>
+    </div>
+    <nav class="nav">
+      <a class="item {{ 'active' if active=='dashboard' }}" href="/dashboard"><span class="text">Dashboard</span></a>
+      <a class="item {{ 'active' if active=='security'  }}" href="/dashboard/security"><span class="text">Security</span></a>
+      <a class="item {{ 'active' if active=='settings'  }}" href="/dashboard/settings"><span class="text">Settings</span></a>
+      <div class="section">OTHER</div>
+      <a class="item" href="/logout"><span class="text">Logout</span></a>
+      <a class="item" href="javascript:history.back()"><span class="text">← Kembali</span></a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <button id="sidebar-toggle" class="toggle" title="Collapse" aria-label="Toggle sidebar"></button>
+      <div class="top-title" style="font-weight:700">{{ header or "Dashboard" }}</div>
+    </div>
+
+    <div class="container">
+      {# dua-duanya didukung agar semua template aman #}
+      {% block content %}{% endblock %}
+      {% block body %}{% endblock %}
+    </div>
+  </main>
+</div>
+
+<script src="/dashboard-static/js/sidebar_toggle.js"></script>
+<script src="/dashboard-static/js/ui_theme_bridge.js"></script>
+<script>
+/* Bridge kecil: ambil logo & accent dari ui-config */
+(async () => {
+  try {
+    const res = await fetch('/api/ui-config');
+    const cfg = await res.json();
+
+    // logo dinamis
+    const $logo = document.getElementById('app-logo');
+    if (cfg && cfg.logo_url) {
+      $logo.src = cfg.logo_url;
+      $logo.style.display = 'inline-block';
+    } else {
+      // kalau belum ada logo_url, tampilkan fallback default
+      $logo.style.display = 'inline-block';
+    }
+
+    // optional: apply accent ke CSS variables kalau tema kamu mendukung
+    if (cfg && cfg.accent) {
+      document.documentElement.style.setProperty('--accent', cfg.accent);
+    }
+  } catch (e) {
+    // biarkan silent agar tidak ganggu render
+  }
+})();
+</script>
+<script defer src="/dashboard-static/js/hotfix_dashboard_size.js"></script>
+<script src="/dashboard/dashboard-static/js/remove_option_button.js"></script>
+<script src="/dashboard/dashboard-static/js/compact_layout.js"></script>
+</body>
+</html>

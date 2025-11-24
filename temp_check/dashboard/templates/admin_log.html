@@ -1,0 +1,16 @@
+{% extends 'base.html
+{% block title %}Admin Log{% endblock %}
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">📜 Admin Activity Log</h2>
+    <table class="table table-dark table-striped">
+      <thead><tr><th>User</th><th>Action</th><th>Timestamp</th></tr></thead>
+      <tbody>
+        {% for username, action, timestamp in logs %}
+          <tr><td>{{ username }}</td><td>{{ action }}</td><td>{{ timestamp }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <a href="/dashboard" class="btn btn-secondary mt-3">← Kembali ke Dashboard</a>
+  </div>
+{% endblock %}

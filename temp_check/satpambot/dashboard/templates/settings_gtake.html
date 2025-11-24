@@ -1,0 +1,23 @@
+
+{% extends "base_gtake.html" %}
+{% block content %}
+<div class="card"><h3>Settings</h3>
+  <form method="post" class="grid" style="display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px">
+    <div class="col-span-6" style="grid-column:span 6">
+      <label class="muted">Theme</label>
+      <input name="theme" placeholder="gtake" style="width:100%;padding:.6rem;border-radius:.6rem;border:1px solid rgba(255,255,255,.1);background:#0f172a;color:#e5e7eb">
+    </div>
+    <div class="col-span-6" style="grid-column:span 6">
+      <label class="muted">Accent Color</label>
+      <input name="accent" placeholder="#3b82f6" style="width:100%;padding:.6rem;border-radius:.6rem;border:1px solid rgba(255,255,255,.1);background:#0f172a;color:#e5e7eb">
+    </div>
+    <div class="col-span-12" style="grid-column:span 12">
+      <label class="muted">Background URL</label>
+      <input name="bg_url" placeholder="https://..." style="width:100%;padding:.6rem;border-radius:.6rem;border:1px solid rgba(255,255,255,.1);background:#0f172a;color:#e5e7eb">
+    </div>
+    <div style="grid-column:span 12;text-align:right">
+      <button class="btn" type="submit">Save</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

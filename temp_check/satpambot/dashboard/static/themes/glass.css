@@ -1,0 +1,11 @@
+
+body {
+  background: url('/static/img/bg-glass.jpg') no-repeat center center fixed;
+  background-size: cover;
+  color: #fff;
+}
+.card {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(5px);
+}

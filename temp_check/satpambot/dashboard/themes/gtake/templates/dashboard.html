@@ -1,0 +1,156 @@
+{# satpambot/dashboard/themes/gtake/templates/dashboard.html #}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Dashboard</title>
+  <!-- Theme & base CSS -->
+  <link rel="stylesheet" href="{{ url_for('dashboard_static_top', filename='css/neo_aurora_plus.css') }}">
+  <link rel="stylesheet" href="/dashboard-theme/gtake/theme.css">
+  <!-- Drag & Drop styles -->
+  <link rel="stylesheet" href="{{ url_for('dashboard.static', filename='css/phish_lab.css') }}{% if cache_bust %}?v={{ cache_bust }}{% endif %}">
+  <!-- JS (live mini monitor, phash dragdrop) -->
+  <script src="{{ url_for('dashboard.static', filename='js/neo_dashboard_live.js') }}{% if cache_bust %}?v={{ cache_bust }}{% endif %}" defer></script>
+  <script src="{{ url_for('dashboard.static', filename='js/dragdrop_phash.js') }}{% if cache_bust %}?v={{ cache_bust }}{% endif %}" defer></script>
+</head>
+<body class="gtake-body">
+
+  <!-- Sidebar (hanya route yang valid) -->
+  <aside class="gtake-sidebar">
+    <div class="brand">G.TAKE</div>
+    <nav class="nav">
+      <a class="nav-item active" href="{{ url_for('dashboard.index') }}">Dashboard</a>
+      <a class="nav-item" href="{{ url_for('dashboard.settings_page') }}">Settings</a>
+      <a class="nav-item" href="{{ url_for('dashboard.security_page') }}">Security</a>
+      <a class="nav-item danger" href="{{ url_for('dashboard.logout_bp') }}">Log out</a>
+    </nav>
+  </aside>
+
+  <!-- Main content -->
+  <main class="gtake-main">
+    <div class="grid grid-2">
+      <!-- Kiri -->
+      <section class="col">
+        <!-- Mini Monitor (real-time) -->
+        <div class="card">
+          <div class="card-header">
+            <strong>Mini Monitor</strong> <span class="muted">(real-time)</span>
+            <div class="right">
+              <span>CPU: <b id="mm_cpu">--%</b></span>
+              <span style="margin-left:12px">RAM: <b id="mm_ram">-- MB</b></span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div>Uptime: <span id="mm_uptime">-- --</span></div>
+              <div style="margin-left:16px">Updated: <span id="mm_updated">--</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity (60fps) - hanya grafik -->
+        <div class="card">
+          <div class="card-header"><strong>Activity (60fps)</strong></div>
+          <div class="card-body">
+            <canvas id="activityChart" width="1100" height="220"></canvas>
+          </div>
+        
+<div id="drop-log" class="muted" style="margin-top:6px"></div>
+</div>
+      </section>
+
+      <!-- Kanan -->
+      <section class="col">
+        <!-- Banned Users (live) — satu saja -->
+        <div class="card">
+          <div class="card-header">
+            <strong>Banned Users (live)</strong>
+            <button id="ban_refresh" class="btn-sm" style="float:right">Refresh</button>
+          </div>
+          <div class="card-body">
+            <table class="table compact" id="ban_table">
+              <thead>
+                <tr>
+                  <th>Time</th><th>User ID</th><th>Reason</th><th>By</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td colspan="4" class="muted">Belum ada data.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Drag & Drop (SATU kotak lebar penuh) -->
+    <section class="card" style="margin-top:24px">
+      <div class="card-header"><strong>Drag & Drop</strong></div>
+      <div class="card-body">
+        <div id="dropZone" class="dropzone">Drop files here...</div>
+        <input type="file" id="fileInput" style="display:none" />
+        <input type="file" id="dashPick" style="display:none" />
+        <div class="muted" style="margin-top:8px">
+          Gambar yang diunggah akan di-hash (pHash) dan disimpan ke blokir-lists bila cocok.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <style>
+    /* Sedikit util agar rapi di tema gtake */
+    .grid{display:grid;grid-gap:16px}
+    .grid-2{grid-template-columns: 1fr 1fr}
+    .col{display:flex;flex-direction:column;gap:16px}
+    .card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px}
+    .card-header{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between}
+    .card-body{padding:16px}
+    .muted{opacity:.7}
+    .btn-sm{padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff;cursor:pointer}
+    .table{width:100%}
+    .table th,.table td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,0.06)}
+    .dropzone{border:2px dashed rgba(255,255,255,0.25);border-radius:12px;padding:18px;text-align:center}
+    .gtake-body{display:flex}
+    .gtake-sidebar{width:220px;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));padding:16px}
+    .gtake-sidebar .brand{font-weight:700;margin-bottom:12px}
+    .gtake-sidebar .nav{display:flex;flex-direction:column;gap:8px}
+    .gtake-sidebar .nav-item{padding:10px 12px;border-radius:10px;color:#cfd8ff;text-decoration:none}
+    .gtake-sidebar .nav-item:hover{background:rgba(255,255,255,.06)}
+    .gtake-sidebar .nav-item.active{background:rgba(255,255,255,.08);color:#fff}
+    .gtake-sidebar .nav-item.danger{color:#ffb3b3}
+    .gtake-main{flex:1;padding:20px}
+    @media (max-width: 1100px){.grid-2{grid-template-columns:1fr}}
+  </style>
+
+  <script>
+    // ==== JS kecil: load banned users list ====
+    async function loadBans() {
+      try {
+        const r = await fetch("/dashboard/api/banned_users");
+        const j = await r.json();
+        const tbody = document.querySelector("#ban_table tbody");
+        tbody.innerHTML = "";
+        const rows = (j && j.rows) || [];
+        if (!rows.length) {
+          tbody.innerHTML = '<tr><td colspan="4" class="muted">Belum ada data.</td></tr>';
+          return;
+        }
+        for (const it of rows) {
+          const tr = document.createElement("tr");
+          tr.innerHTML =
+            `<td>${it.time_human || (it.time || "")}</td>` +
+            `<td>${it.user_id || ""} ${it.username ? '('+it.username+')' : ''}</td>` +
+            `<td>${it.reason || ""}</td>` +
+            `<td>${it.mod || ""}</td>`;
+          tbody.appendChild(tr);
+        }
+      } catch (e) {
+        console.warn("loadBans failed:", e);
+      }
+    }
+    document.getElementById("ban_refresh")?.addEventListener("click", loadBans);
+    window.addEventListener("load", loadBans);
+  </script>
+</body>
+</html>
+{% include 'components/today_log.html' %}

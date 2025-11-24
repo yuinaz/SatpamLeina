@@ -1,0 +1,9 @@
+{
+  "env": {
+    "PASSIVE_TO_BOT_ENABLE": "1",
+    "PASSIVE_TO_BOT_SHARE": "1.0",
+    "PASSIVE_TO_BOT_REASON_TOKENS": "passive,shadow,memory,normalize:chat,observer,passive-force-include",
+    "PASSIVE_TO_BOT_LOCK_TTL": "5",
+    "PASSIVE_TO_BOT_LOCK_PREFIX": "xp:lock:botbridge"
+  }
+}

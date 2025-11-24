@@ -1,0 +1,5 @@
+{
+  "warns": [
+    "sitecustomize.py: /healthz not exposed"
+  ]
+}

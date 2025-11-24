@@ -1,0 +1,14 @@
+{
+  "text": {
+    "start": 30,
+    "period": 300
+  },
+  "phish": {
+    "start": 35,
+    "period": 300
+  },
+  "slang": {
+    "start": 40,
+    "period": 300
+  }
+}

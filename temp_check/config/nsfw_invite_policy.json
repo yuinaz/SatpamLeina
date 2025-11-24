@@ -1,0 +1,21 @@
+{
+  "autoban_enabled": true,
+  "ban_delete_days": 7,
+  "hint_emojis": [
+    "💔",
+    "🥀"
+  ],
+  "new_account_days": 7,
+  "fallback_action": "ban",
+  "fallback_timeout_minutes": 60,
+  "invite_unknown_action": "ban",
+  "allowlist_guild_ids": [],
+  "allowlist_invite_codes": [],
+  "nsfw_invite_keywords": [
+    "nsfw",
+    "18+",
+    "xxx",
+    "hentai",
+    "porn"
+  ]
+}

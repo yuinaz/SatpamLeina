@@ -1,0 +1,84 @@
+
+# === v17 additions ===
+
+# Hash images from URLs (max 20)
+@phish_api.route("/dashboard/api/phash/url", methods=["POST"])
+def phash_from_url():
+    _ensure_files()
+    payload = request.get_json(silent=True) or {}
+    urls = payload.get("urls") or []
+    if isinstance(urls, str):
+        urls = [urls]
+    urls = [u for u in urls if isinstance(u, str) and u.startswith(("http://", "https://"))][:20]
+    if not urls:
+        return jsonify({"error":"no urls"}), 400
+
+    try:
+        import requests
+    except Exception:
+        return jsonify({"error":"server missing 'requests'"}), 500
+
+    data = _load()
+    known = set([h["hash"] if isinstance(h, dict) else h for h in data.get("hashes", [])])
+    added, skipped = [], []
+    for u in urls:
+        try:
+            r = requests.get(u, timeout=8)
+            ct = (r.headers.get("content-type") or "").lower()
+            if r.status_code != 200 or ("image" not in ct and not re.search(r"\.(png|jpe?g|webp|bmp|gif)$", u.split("?")[0], re.I)):
+                skipped.append(f"{u}:not-image"); continue
+            from io import BytesIO
+            img = Image.open(BytesIO(r.content)).convert("RGB")
+            ph = str(imagehash.phash(img))
+            if ph in known: 
+                skipped.append(ph); continue
+            item = {"hash": ph, "source": u, "ts": int(time.time())}
+            data.setdefault("hashes", []).append(item)
+            known.add(ph); added.append(item)
+        except Exception:
+            skipped.append(f"{u}:error"); continue
+
+    _save(data)
+    try:
+        with open(HASH_TXT, "w", encoding="utf-8") as out:
+            for it in data["hashes"]:
+                out.write((it["hash"] if isinstance(it, dict) else str(it)) + "\\n")
+    except Exception:
+        pass
+
+    return jsonify({"added": added, "skipped": skipped, "total": len(data.get("hashes", []))})
+
+# Simple banned users store
+BANS_JSON = os.path.join(DATA_DIR, "bans.json")
+
+def _load_bans():
+    os.makedirs(DATA_DIR, exist_ok=True)
+    if not os.path.exists(BANS_JSON):
+        with open(BANS_JSON, "w", encoding="utf-8") as f:
+            json.dump({"list":[{"user":"user","date":"monday,22/06/25", "ts": int(time.time())}]}, f)
+    try:
+        with open(BANS_JSON, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {"list":[]}
+
+def _save_bans(bdata):
+    with open(BANS_JSON, "w", encoding="utf-8") as f:
+        json.dump(bdata, f, ensure_ascii=False, indent=2)
+
+@phish_api.route("/dashboard/api/bans", methods=["GET"])
+def bans_list():
+    return jsonify(_load_bans())
+
+@phish_api.route("/dashboard/api/bans", methods=["POST"])
+def bans_add():
+    payload = request.get_json(silent=True) or {}
+    u = str(payload.get("user") or "").strip().lstrip("@")
+    d = str(payload.get("date") or "").strip()
+    if not u or not d:
+        return jsonify({"error":"need user and date"}), 400
+    b = _load_bans()
+    item = {"user": u, "date": d, "ts": int(time.time())}
+    b.setdefault("list", []).append(item)
+    _save_bans(b)
+    return jsonify({"ok": True, "item": item, "total": len(b.get("list", []))})

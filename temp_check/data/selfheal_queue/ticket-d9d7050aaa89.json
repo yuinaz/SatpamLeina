@@ -1,0 +1,12 @@
+{
+  "id": "d9d7050aaa89",
+  "created_at": 1760503099.090592,
+  "status": "diagnosed",
+  "level": "ERROR",
+  "message": "Command error: Command \"qna\" is not found",
+  "where": "friendly_errors:on_command_error",
+  "time": 1760503099.090592,
+  "diagnosis": {
+    "note": "Groq disabled or not configured."
+  }
+}

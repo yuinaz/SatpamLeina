@@ -1,0 +1,66 @@
+/* Layout center + blur gradient background */
+:root{
+  --bg1:#6173ff; --bg2:#b385ff;
+  --card-bg:rgba(255,255,255,.06);
+  --card-br:16px; --border:rgba(255,255,255,.10);
+  --text:#e6e8ee; --muted:#a8b0bf;
+  --accent1:#4f67ff; --accent2:#7aa2ff;
+  --shadow:0 20px 60px rgba(0,0,0,.35);
+}
+
+html,body{height:100%}
+body{
+  margin:0; color:var(--text);
+  background: radial-gradient(1000px 600px at 20% 10%, rgba(97,115,255,.35), transparent),
+              radial-gradient(900px 700px at 80% 80%, rgba(179,133,255,.30), transparent),
+              #0b0f1a;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+}
+.login-wrap{
+  min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+}
+.login-card{
+  position:relative;
+  width:min(520px, 94vw);
+  border-radius:var(--card-br);
+  background:linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.08));
+  box-shadow:var(--shadow);
+  border:1px solid var(--border);
+  padding:72px 28px 26px;
+  backdrop-filter:saturate(150%) blur(14px);
+}
+.login-avatar{
+  position:absolute; left:50%; top:-42px; transform:translateX(-50%);
+  width:84px; height:84px; border-radius:50%;
+  background:#0e1a36; color:#fff; display:grid; place-items:center;
+  box-shadow:0 10px 30px rgba(0,0,0,.45), inset 0 0 0 6px rgba(255,255,255,.10);
+}
+.avatar-ico{width:44px; height:44px}
+
+.login-form{display:grid; gap:14px}
+.input-row{
+  display:grid; grid-template-columns:42px 1fr; align-items:center;
+  border:1px solid var(--border); border-radius:14px;
+  background:rgba(8,15,26,.55);
+}
+.input-row .ico{
+  display:grid; place-items:center; color:#c8d0df;
+}
+.input-row input{
+  background:transparent; border:0; outline:none; padding:12px 12px; color:var(--text);
+  font-size:15.5px;
+}
+
+.login-meta{
+  display:flex; align-items:center; justify-content:space-between; margin-top:4px; color:var(--muted); font-size:13px;
+}
+.remember{display:inline-flex; gap:8px; align-items:center}
+.forgot{color:#cdd6ff; text-decoration:none}
+.forgot:hover{text-decoration:underline}
+
+.btn-login{
+  appearance:none; border:0; cursor:pointer; color:#fff; font-weight:700; letter-spacing:.08em;
+  border-radius:18px; padding:12px 18px; width:100%;
+  background:linear-gradient(90deg, var(--accent1), var(--accent2));
+  box-shadow:0 10px 30px rgba(79,103,255,.35);
+}

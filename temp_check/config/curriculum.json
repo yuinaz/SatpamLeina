@@ -1,0 +1,9 @@
+{
+  "enabled": true,
+  "target_xp": 2500,
+  "min_days": 7,
+  "min_acc": 95.0,
+  "report_hhmm": "2355",
+  "tz_offset_minutes": 420,
+  "report_channel_id": 1426397317598154844
+}

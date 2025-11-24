@@ -1,0 +1,40 @@
+{% extends 'base.html
+
+{% block title %}Role & Channel Maker{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h3>🎨 Buat Role Baru</h3>
+  <form action="/create-role" method="POST" enctype="multipart/form-data" class="mb-5">
+    <div class="mb-3">
+      <label for="role_name" class="form-label">Nama Role</label>
+      <input type="text" name="role_name" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label for="role_color" class="form-label">Warna</label>
+      <input type="color" name="role_color" class="form-control form-control-color" value="#3498db">
+    </div>
+    <div class="mb-3">
+      <label for="role_icon" class="form-label">Upload Ikon (PNG/GIF)</label>
+      <input type="file" name="role_icon" accept="image/*" class="form-control">
+    </div>
+    <button type="submit" class="btn btn-primary">Buat Role</button>
+  </form>
+
+  <h3>📁 Buat Channel Baru</h3>
+  <form action="/create-channel" method="POST">
+    <div class="mb-3">
+      <label for="channel_name" class="form-label">Nama Channel</label>
+      <input type="text" name="channel_name" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label for="channel_type" class="form-label">Tipe</label>
+      <select name="channel_type" class="form-select">
+        <option value="text">Text</option>
+        <option value="voice">Voice</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-success">Buat Channel</button>
+  </form>
+</div>
+{% endblock %}

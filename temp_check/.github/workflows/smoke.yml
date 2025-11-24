@@ -1,0 +1,72 @@
+<<<<<<< HEAD
+name: Preflight Smoketest
+
+on:
+  push:
+    branches: [ main, fix/**, hotfix/** ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    env:
+      RUN_BOT: "0"  # prevent bot from starting on CI
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install deps (best-effort)
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f constraints.win-py310.txt ]; then pip install -r constraints.win-py310.txt || true; fi
+
+      - name: Run smoketests
+        run: |
+          set -eux
+          python -m compileall -q .
+          [ -f scripts/smoketest_all.py ] && python scripts/smoketest_all.py || true
+          [ -f scripts/smoke_cogs.py ]     && python scripts/smoke_cogs.py     || true
+
+      - name: Upload smoke artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoketest-logs
+          path: |
+            smoketest_report/**
+            **/smoke*.log
+            **/SMOKE*.txt
+          if-no-files-found: ignore
+=======
+name: Smoke
+on:
+  push:
+  pull_request:
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Smoke tests
+        run: python scripts/smoke_all.py
+>>>>>>> ef940a8 (heal)

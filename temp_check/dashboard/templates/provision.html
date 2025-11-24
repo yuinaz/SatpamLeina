@@ -1,0 +1,35 @@
+{% extends 'base.html
+{% block title %}🛠️ Provision{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="/dashboard" class="btn btn-outline-light">⬅️ Dashboard</a>
+    <h3>🛠️ Provision</h3>
+  </div>
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="card bg-dark text-light h-100">
+        <div class="card-header">Buat Role</div>
+        <div class="card-body">
+          <form method="post" action="/provision/role">
+            <div class="mb-2"><input class="form-control" name="name" placeholder="Nama Role" required></div>
+            <div class="mb-2"><input class="form-control" name="color" placeholder="#ff2aa1 (opsional)"></div>
+            <button class="btn btn-primary">Buat Role</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card bg-dark text-light h-100">
+        <div class="card-header">Buat Channel</div>
+        <div class="card-body">
+          <form method="post" action="/provision/channel">
+            <div class="mb-2"><input class="form-control" name="name" placeholder="nama-channel" required></div>
+            <button class="btn btn-primary">Buat Channel</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

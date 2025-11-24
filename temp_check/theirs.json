@@ -1,0 +1,82 @@
+{
+  "schema_version": 2,
+  "timezone": "Asia/Jakarta",
+  "locale": "id_ID",
+
+  "report_channels": {
+    "default": 1424614683750432849,
+    "daily":   1424614683750432849,
+    "weekly":  1424614683750432849,
+    "monthly": 1424614683750432849
+  },
+
+  "weekly": {
+    "enabled": true,
+    "start_day": "Mon",
+    "end_day": "Mon",
+    "timezone": "Asia/Jakarta",
+    "report_channel_id": 1424614683750432849
+  },
+
+  "daily_report": {
+    "enabled": true,
+    "hour": 15,
+    "minute": 0,
+    "window_days": 1,
+    "min_history_days": 1,
+    "suppress_if_zero": true
+  },
+
+  "weekly_report": {
+    "enabled": true,
+    "day_of_week": "mon",
+    "hour": 17,
+    "minute": 0,
+    "min_history_days": 7,
+    "window_days": 7,
+    "suppress_if_zero": true,
+    "week_start": "Mon",
+    "week_end": "Mon"
+  },
+
+  "monthly_report": {
+    "enabled": true,
+    "day_of_month": 1,
+    "hour": 9,
+    "minute": 0,
+    "min_history_days": 28,
+    "window_days": 31,
+    "suppress_if_zero": true,
+    "last_day_if_short": true
+  },
+
+  "rollup": {
+    "metrics": [
+      "total_actions",
+      "bans",
+      "autobans",
+      "false_positives",
+      "appeals",
+      "ftab_triggers",
+      "pack_mime_bursts",
+      "presence_updates"
+    ],
+    "group_by": ["guild", "channel"],
+    "top_n": 10
+  },
+
+  "formatting": {
+    "use_embeds": true,
+    "color": 16753920,
+    "title_prefix": "📊",
+    "templates": {
+      "daily":   "📊 **Laporan Harian** — {date_local}\\nAksi: {total_actions} | Ban: {bans} | False+: {false_positives}",
+      "weekly":  "📈 **Laporan Mingguan** ({range_local})\\nAksi: {total_actions} | Ban: {bans} | False+: {false_positives}",
+      "monthly": "📈 **Laporan Bulanan {month_local}**\\nAksi: {total_actions} | Ban: {bans} | False+: {false_positives}"
+    }
+  },
+
+  "retention": { "keep_days": 180 },
+  "backfill_on_start": true,
+  "privacy": { "redact_user_ids": true, "show_examples": false }
+}

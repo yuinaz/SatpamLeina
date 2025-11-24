@@ -1,0 +1,3 @@
+mention_only = true
+max_reply_chars = 700
+thread_safe = true

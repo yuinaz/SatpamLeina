@@ -1,0 +1,12 @@
+{
+  "id": "954afc69da09",
+  "created_at": 1760503514.2088525,
+  "status": "diagnosed",
+  "level": "WARNING",
+  "message": "[autoload_selfheal_autofix] Extension 'satpambot.bot.modules.discord_bot.cogs.a06_groq_model_fallback_overlay' is already loaded.",
+  "where": "satpambot.bot.modules.discord_bot.cogs.a00_autoload_selfheal_autofix:cog_load",
+  "time": 1760503514.2088525,
+  "diagnosis": {
+    "note": "Groq disabled or not configured."
+  }
+}

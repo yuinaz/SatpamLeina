@@ -1,0 +1,8 @@
+{
+  "check_syntax": true,
+  "check_json": true,
+  "check_upsert_calls": true,
+  "check_features": true,
+  "check_main_import_order": true,
+  "check_http": true
+}

@@ -1,0 +1,9 @@
+{% include 'components/phish_dropzone.html
+{% extends "dashboard/layout.html" %}{% block body %}
+<h1>SatpamBot</h1><p class="muted">Dashboard ringkas. Pilih menu di bawah.</p>
+<div class="grid">
+  <a class="tile" href="/uptime"><h3>Uptime</h3><p>Cek status uptime endpoint.</p></a>
+  <a class="tile" href="/healthz"><h3>Health</h3><p>Endpoint health 200 OK.</p></a>
+  <a class="tile" href="/logs"><h3>Logs</h3><p>Lihat log (jika disediakan).</p></a>
+</div>{% endblock %}
+<script src="/dashboard/dashboard-static/js/remove_option_button.js"></script>

@@ -1,0 +1,27 @@
+schedule_days: 4
+auto_apply_non_critical: true
+
+allow_packages:
+  - openai
+  - python-dotenv
+  - httpx
+  - pillow
+  - uvicorn
+  - orjson
+
+deny_packages:
+  - discord.py
+  - pip
+  - setuptools
+  - wheel
+
+critical_cogs:
+  - ban_
+  - ban_secure
+  - ban_queue_watcher
+  - ban_logger
+  - fast_guard
+  - anti_image_
+  - anti_image_phish
+  - anti_image_phash
+  - anti_image_scored_guard

@@ -1,0 +1,16 @@
+<!doctype html>
+{% include 'components/phish_dropzone.html' %}
+<html><head><meta charset="utf-8" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https: http: 'unsafe-inline' 'unsafe-eval'">
+<title>SatpamBot Widget</title><link rel="stylesheet" href="styles.css" /></head>
+<body>
+  <div class="wrap">
+    <div class="row"><div class="dot" id="botDot"></div><div class="label">Bot</div><div class="sub" id="botSub">checking…</div></div>
+    <div class="row"><div class="dot" id="renderDot"></div><div class="label">Render</div><div class="sub" id="renderSub">checking…</div></div>
+    <div class="row"><div class="dot" id="upDot"></div><div class="label">UptimeRobot</div><div class="sub" id="upSub">checking…</div></div>
+    <div class="row"><div class="dot" id="envDot"></div><div class="label">ENV</div><div class="sub" id="envSub">-</div></div>
+    <div class="row"><div class="dot" id="userDot"></div><div class="label">Discord User</div><div class="sub" id="userSub">-</div></div>
+    <div class="btns"><button id="openBtn">Open Dashboard</button></div>
+  </div>
+  <script src="renderer.js"></script>
+</body></html>

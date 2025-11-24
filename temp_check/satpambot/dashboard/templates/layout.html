@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}SatpamBot{% endblock %}</title>
+
+  <!-- Theme CSS (with ID for JS to swap) -->
+  <link id="theme-style" rel="stylesheet" href="{{ url_for('static', filename=theme_css) }}">
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background: url('{{ background_url or url_for("static", filename="images/background.jpg") }}') no-repeat center center fixed;
+      background-size: cover;
+      position: relative;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    #particles-js, .gradient-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+    }
+
+    .gradient-overlay {
+      background: linear-gradient(-45deg, rgba(30, 60, 114, 0.6), rgba(42, 82, 152, 0.6), rgba(30, 60, 114, 0.6));
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      z-index: -1;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .navbar, .sidebar {
+      background-color: rgba(0, 0, 0, 0.6) !important;
+      backdrop-filter: blur(8px);
+    }
+
+    .nav-link, .navbar-brand, .text-light {
+      color: #fff !important;
+    }
+
+    main {
+      background-color: rgba(0, 0, 0, 0.5);
+      border-radius: 12px;
+      padding: 20px;
+      color: #fff;
+    }
+  </style>
+<!-- SB_THEME_GLOBAL_HEAD -->
+<style>
+:root{
+  --bg:#0b0e14; --card:#141923; --border:#222b3b; --text:#e6e6e6;
+  --muted:#a8b0c2; --sb-bg-url:''; --sb-bg-opacity:0.15;
+}
+[data-theme="light"]{
+  --bg:#f6f7fb; --card:#ffffff; --border:#e6e8ef; --text:#1f2737; --muted:#4b5565;
+}
+html,body{min-height:100%}
+body{background:var(--bg); color:var(--text);}
+body::before{
+  content:""; position:fixed; inset:0; z-index:-1;
+  background-image:var(--sb-bg-url); background-size:cover; background-position:center;
+  opacity:var(--sb-bg-opacity); filter:blur(0px); pointer-events:none;
+}
+.sb-theme-hide-bg body::before{display:none;}
+/* Container transparan tipis agar bg kelihatan lembut */
+.sb-translucent .card, .sb-translucent main, .sb-translucent .container {
+  background-color: color-mix(in hsl, var(--card) 92%, transparent);
+}
+/* Widget */
+#sb-theme-widget{
+  position:fixed; top:10px; right:10px; z-index:9999;
+  background:var(--card); border:1px solid var(--border); border-radius:12px;
+  padding:10px; box-shadow:0 8px 28px rgba(0,0,0,.35); font: 14px/1.3 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif;
+}
+#sb-theme-widget .row{display:flex; gap:6px; align-items:center; margin-top:6px}
+#sb-theme-widget input[type="url"]{min-width:260px; padding:8px 10px; border-radius:10px; border:1px solid var(--border); background:transparent; color:var(--text)}
+#sb-theme-widget input[type="range"]{width:130px}
+#sb-theme-widget button{
+  padding:8px 10px; border:1px solid var(--border); border-radius:10px; background:transparent; color:var(--text); cursor:pointer; font-weight:600;
+}
+#sb-theme-widget .primary{background:#5865F2; border-color:#5865F2; color:#fff}
+#sb-theme-widget .muted{opacity:.8}
+#sb-theme-widget .mini{position:absolute; top:6px; right:6px; padding:2px 8px; border-radius:8px; font-size:12px}
+#sb-theme-widget.collapsed .body{display:none}
+</style>
+<script>
+(()=>{try{
+  // init theme from localStorage
+  const t = localStorage.getItem("sb_theme")||"dark";
+  if(t==="light") document.documentElement.setAttribute("data-theme","light");
+  // init bg url & opacity
+  const url = localStorage.getItem("sb_bg_url")||"";
+  const op  = localStorage.getItem("sb_bg_opacity")||"0.15";
+  if(url){
+    document.documentElement.style.setProperty("--sb-bg-url", `url("${url}")`);
+  } else {
+    document.documentElement.style.setProperty("--sb-bg-url", "none");
+  }
+  document.documentElement.style.setProperty("--sb-bg-opacity", op);
+}catch(e){}})();
+</script>
+
+<link rel="stylesheet" href="/dashboard/dashboard-static/css/layout_compact.css">
+</head>
+<body>
+  <!-- Efek partikel dan gradien -->
+  <div id="particles-js"></div>
+  <div class="gradient-overlay"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-dark px-4 py-3">
+    <span class="navbar-brand">🤖 SatpamBot</span>
+    <div class="d-flex flex-wrap align-items-center">
+      {% if 'username' in session %}
+        <span class="text-light me-3">👤 {{ session['username'] }}</span>
+      {% endif %}
+      <a href="/logout" class="btn btn-sm btn-danger me-3">Logout</a>
+
+      <a href="/log-ai" class="text-light me-3">🧠 AI Log Detection</a>
+      <a href="/sso" class="text-light me-3">🔐 SSO Login</a>
+      <a href="/server-summary" class="text-light me-3">📝 Server Summary</a>
+      <a href="/event-log" class="text-light me-3">📡 Event Log</a>
+      <a href="/user-locator" class="text-light me-3">🌍 User Locator</a>
+      <a href="/resource" class="text-light me-3">📊 Resource Monitor</a>
+      <a href="/plugin" class="text-light me-3">🧩 Plugin Manager</a>
+      <a href="/themes" class="text-light me-3">🎨 Theme Manager</a>
+      <a href="/scheduler" class="text-light me-3">⏰ Schedule Command</a>
+      <a href="/embed-builder" class="text-light me-3">🧱 Embed Builder</a>
+      <a href="/role-maker" class="text-light me-3">🏗️ Role Maker</a>
+    </div>
+  </nav>
+
+  <!-- Content -->
+  <div class="container-fluid mt-4">
+    <div class="row">
+      <!-- Sidebar -->
+      <aside class="col-md-2 sidebar py-4">
+        <ul class="nav flex-column">
+          <li class="nav-item"><a class="nav-link" href="/dashboard">📊 Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="/editor">📝 Editor</a></li>
+          <li class="nav-item"><a class="nav-link" href="/grafik">📈 Statistik</a></li>
+          <li class="nav-item"><a class="nav-link" href="/upload">📂 Upload</a></li>
+          <li class="nav-item"><a class="nav-link" href="/change-password">🔒 Ganti Password</a></li>
+
+          <!-- Tema -->
+          <li class="nav-item mt-3">
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                🎨 Ganti Tema
+              </button>
+              <ul class="dropdown-menu w-100">
+                {% for t in ['default.css', 'dark.css', 'blue.css', 'glass.css', 'minimal.css'] %}
+                <li>
+                  <form method="POST" action="/themes">
+                    <input type="hidden" name="theme" value="{{ t }}">
+                    <button type="submit" class="dropdown-item">{{ t.replace('.css', '').capitalize() }}</button>
+                  </form>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </li>
+
+          <!-- Upload Background -->
+          <li class="nav-item mt-3 px-2">
+            <form action="/upload-background" method="POST" enctype="multipart/form-data">
+              <input type="file" name="background" accept="image/*" class="form-control form-control-sm mb-2">
+              <button type="submit" class="btn btn-sm btn-primary w-100">🖼️ Upload Background</button>
+            </form>
+            {% if background_url %}
+              <small class="text-light mt-1 d-block">Aktif: {{ background_url.split('/')[-1] }}</small>
+            {% endif %}
+          </li>
+        </ul>
+      </aside>
+
+      <!-- Main -->
+      <main class="col-md-10">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{{ url_for('static', filename='js/particles.min.js') }}"></script>
+  <script>
+    particlesJS("particles-js", {
+      particles: {
+        number: { value: 60 },
+        color: { value: "#ffffff" },
+        shape: { type: "circle" },
+        opacity: { value: 0.4 },
+        size: { value: 2 },
+        line_linked: {
+          enable: true,
+          distance: 120,
+          color: "#ffffff",
+          opacity: 0.4,
+          width: 1
+        },
+        move: {
+          enable: true,
+          speed: 1.5
+        }
+      }
+    });
+  </script>
+
+  <!-- AJAX Theme Switch -->
+  <script>
+    document.querySelectorAll('form[action="/themes"]').forEach(form => {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const selectedTheme = this.querySelector('input[name="theme"]').value;
+
+        fetch("/theme", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ theme: selectedTheme })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === "success") {
+            const cssLink = document.getElementById("theme-style");
+            if (cssLink) {
+              cssLink.href = "/static/themes/" + data.theme;
+            }
+          } else {
+            alert("❌ Gagal mengganti tema.");
+          }
+        })
+        .catch(err => {
+          console.error("AJAX error:", err);
+        });
+      });
+    });
+  </script>
+<!-- SB_THEME_GLOBAL_WIDGET -->
+<div id="sb-theme-widget" class="sb-translucent">
+  <button class="mini muted" id="sb-mini">–</button>
+  <div class="row">
+    <button id="sb-theme" class="primary" title="Toggle dark/light">Theme</button>
+    <button id="sb-back" title="Back">Back</button>
+  </div>
+  <div class="body">
+    <div class="row">
+      <input id="sb-bg-url" type="url" placeholder="Background URL (contoh: /assets/bg.jpg)">
+    </div>
+    <div class="row">
+      <span class="muted">Opacity</span>
+      <input id="sb-bg-op" type="range" min="0" max="0.7" step="0.01">
+      <button id="sb-clear" class="muted" title="Hapus background">Clear</button>
+    </div>
+  </div>
+</div>
+<script>
+(()=>{try{
+  const $ = (id)=>document.getElementById(id);
+  const w = $("sb-theme-widget"); if(!w) return;
+  const btnTheme = $("sb-theme");
+  const btnBack  = $("sb-back");
+  const mini     = $("sb-mini");
+  const inpUrl   = $("sb-bg-url");
+  const inpOp    = $("sb-bg-op");
+  const btnClear = $("sb-clear");
+
+  // hydrate inputs
+  inpUrl.value = localStorage.getItem("sb_bg_url")||"";
+  inpOp.value  = localStorage.getItem("sb_bg_opacity")||"0.15";
+
+  function applyBg(){
+    const u = inpUrl.value.trim();
+    localStorage.setItem("sb_bg_url", u);
+    document.documentElement.style.setProperty("--sb-bg-url", u?`url("${u}")`:"none");
+  }
+  function applyOp(){
+    const v = inpOp.value;
+    localStorage.setItem("sb_bg_opacity", v);
+    document.documentElement.style.setProperty("--sb-bg-opacity", v);
+  }
+  btnClear.onclick = ()=>{ inpUrl.value=""; applyBg(); };
+
+  btnTheme.onclick = ()=>{
+    const isLight = document.documentElement.getAttribute("data-theme")==="light";
+    if(isLight){ document.documentElement.removeAttribute("data-theme"); localStorage.setItem("sb_theme","dark"); }
+    else { document.documentElement.setAttribute("data-theme","light"); localStorage.setItem("sb_theme","light"); }
+  };
+  btnBack.onclick = ()=>{
+    if(history.length>1) history.back(); else window.location.href = "/";
+  };
+  mini.onclick = ()=>{
+    w.classList.toggle("collapsed");
+    mini.textContent = w.classList.contains("collapsed") ? "+" : "–";
+  };
+
+  inpUrl.addEventListener("change", applyBg);
+  inpOp.addEventListener("input", applyOp);
+
+  // auto collapse di layar kecil
+  if(Math.min(window.innerWidth, window.innerHeight) < 520){
+    w.classList.add("collapsed"); mini.textContent = "+";
+  }
+}catch(e){}})();
+</script>
+
+<script src="/dashboard/dashboard-static/js/remove_option_button.js"></script>
+<script src="/dashboard/dashboard-static/js/compact_layout.js"></script>
+</body>
+</html>

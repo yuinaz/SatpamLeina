@@ -1,0 +1,12 @@
+{
+  "id": "8c13f8aaa448",
+  "created_at": 1760503514.2451193,
+  "status": "diagnosed",
+  "level": "WARNING",
+  "message": "[autoload_xp_jitter_web] Extension 'satpambot.bot.modules.discord_bot.cogs.a02_miner_jitter_overlay' is already loaded.",
+  "where": "satpambot.bot.modules.discord_bot.cogs.a00_autoload_xp_jitter_web:cog_load",
+  "time": 1760503514.244714,
+  "diagnosis": {
+    "note": "Groq disabled or not configured."
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "AUTO_BAN_ENABLED": true,
+  "ADMIN_IDS": [
+    "123456789012345678"
+  ],
+  "NOTIFY_WEBHOOK": ""
+}

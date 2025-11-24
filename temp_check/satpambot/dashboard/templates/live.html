@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Live Server{% endblock %}
+{% block content %}
+<div class="container" style="max-width:1100px;margin:auto;padding:16px;">
+  <h2>Live Server</h2>
+  <div id="live-stats" style="display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:12px;">
+    {% for k in ['guilds','members','channels','threads','online','latency_ms'] %}
+    <div class="card" style="padding:14px;border-radius:12px;background:var(--card-bg,#1118);backdrop-filter: blur(6px);">
+      <div style="font-size:12px;opacity:.8;text-transform:uppercase;">{{k}}</div>
+      <div id="stat-{{k}}" style="font-size:24px;font-weight:700;">0</div>
+    </div>
+    {% endfor %}
+  </div>
+  <div style="margin-top:8px;font-size:12px;opacity:.8;">Updated: <span id="stat-updated">-</span></div>
+</div>
+<script src="/dashboard/static/js/neo_dashboard_live.js"></script>
+{% endblock %}

@@ -1,0 +1,6 @@
+.spb-card{font-family:system-ui,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;background:#0f1020;color:#d5d3e7;border:1px solid #2c2848;border-radius:12px;padding:12px;min-width:220px;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.spb-row{display:flex;align-items:center;gap:8px}
+.spb-dot{width:10px;height:10px;border-radius:50%}
+.spb-dot.green{background:#2ecc71}.spb-dot.red{background:#e74c3c}.spb-dot.yellow{background:#f1c40f}
+.spb-label{font-weight:600;font-size:14px}
+.spb-sub{font-size:12px;color:#a19bbf}

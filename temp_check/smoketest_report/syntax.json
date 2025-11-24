@@ -1,0 +1,15 @@
+{
+  "total": 556,
+  "fails": [
+    {
+      "file": "satpambot\\bot\\modules\\discord_bot\\helpers\\smoke_utils.py",
+      "error": "  File \"G:\\DiscordBot\\SatpamLeina\\satpambot\\bot\\modules\\discord_bot\\helpers\\smoke_utils.py\", line 179\n    \\\"\\\"\\\"Ensure a skinny bot instance has the APIs our cogs expect.\\\"\\\"\\\"\n     ^\nSyntaxError: unexpected character after line continuation character\n",
+      "snippet": " 177: # --- retrofit helpers (safe no-op shims) ---\\n 178: def retrofit(bot):\\n 179:     \\\"\\\"\\\"Ensure a skinny bot instance has the APIs our cogs expect.\\\"\\\"\\\"\\n 180:     import types\\n 181: "
+    },
+    {
+      "file": "scripts\\smoke_utils.py",
+      "error": "  File \"G:\\DiscordBot\\SatpamLeina\\scripts\\smoke_utils.py\", line 73\n    \\\"\\\"\\\"Ensure a skinny bot instance has the APIs our cogs expect.\\\"\\\"\\\"\n     ^\nSyntaxError: unexpected character after line continuation character\n",
+      "snippet": "  71: # --- retrofit helpers (safe no-op shims) ---\\n  72: def retrofit(bot):\\n  73:     \\\"\\\"\\\"Ensure a skinny bot instance has the APIs our cogs expect.\\\"\\\"\\\"\\n  74:     import types\\n  75: "
+    }
+  ]
+}

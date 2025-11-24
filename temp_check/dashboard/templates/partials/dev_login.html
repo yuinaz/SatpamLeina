@@ -1,0 +1,9 @@
+{% if dev_fake_login %}
+  <div style="text-align:center;margin-top:12px">
+    <a href="{{ url_for('dev_login_as', username=dev_fake_user) }}"
+       class="btn" style="display:inline-block;width:100%;padding:10px;border-radius:10px;
+       background:#0ea5e9;color:#fff;text-decoration:none">
+      Login sebagai {{ dev_fake_user }}
+    </a>
+  </div>
+{% endif %}

@@ -1,0 +1,12 @@
+{
+  "id": "dc423dd13c3c",
+  "created_at": 1760503514.3807652,
+  "status": "diagnosed",
+  "level": "WARNING",
+  "message": "[autoload_plus] skip satpambot.bot.modules.discord_bot.cogs.a00_auto_local_sync: Extension 'satpambot.bot.modules.discord_bot.cogs.a00_auto_local_sync' is already loaded.",
+  "where": "satpambot.bot.modules.discord_bot.cogs.a00_overlay_autoload_plus:cog_load",
+  "time": 1760503514.3807652,
+  "diagnosis": {
+    "note": "Groq disabled or not configured."
+  }
+}

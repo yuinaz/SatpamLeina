@@ -1,0 +1,43 @@
+# --- BAN FEED API (safe fallback) ---
+@bp.get("/api/bans")
+def api_bans():
+    import time, json, os
+    from pathlib import Path
+    limit = int((request.args.get("limit") or 10))
+    cands = [
+        Path("data/mod/ban_log.json"),
+        Path("data/ban_log.json"),
+        Path("data/mod/bans.json"),
+    ]
+    recs = []
+    for p in cands:
+        try:
+            if p.exists():
+                data = json.loads(p.read_text("utf-8"))
+                if isinstance(data, dict) and "items" in data: data = data["items"]
+                if isinstance(data, list): recs.extend(data)
+        except Exception:
+            pass
+    def norm(x):
+        user = x.get("user") or x.get("username") or x.get("tag") or ""
+        uid  = x.get("user_id") or x.get("id") or x.get("uid")
+        ts   = x.get("ts") or x.get("timestamp") or x.get("time")
+        if isinstance(ts, (int,float)): epoch = int(ts)
+        else:
+            # try parse ISO
+            try:
+                from datetime import datetime, timezone
+                epoch = int(datetime.fromisoformat(str(ts).replace("Z","+00:00")).timestamp())
+            except Exception:
+                epoch = int(time.time())
+        # format WIB
+        try:
+            from datetime import datetime, timedelta, timezone
+            wib = datetime.fromtimestamp(epoch, tz=timezone.utc) + timedelta(hours=7)
+            when = wib.strftime("%A, %d/%m/%y")
+        except Exception:
+            when = ""
+        return {"user": user, "user_id": uid, "when": epoch, "when_str": when}
+    recs = [norm(r) for r in recs][-limit:]
+    # latest last
+    return jsonify(recs)

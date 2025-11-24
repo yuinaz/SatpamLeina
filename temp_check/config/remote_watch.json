@@ -1,0 +1,5 @@
+{
+  "enabled": false,
+  "interval_sec": 900,
+  "check_url": ""
+}

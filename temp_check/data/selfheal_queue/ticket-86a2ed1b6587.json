@@ -1,0 +1,12 @@
+{
+  "id": "86a2ed1b6587",
+  "created_at": 1760502993.7017865,
+  "status": "diagnosed",
+  "level": "WARNING",
+  "message": "[xp/discord] RESET detected prev=609 now=2 -> +0 => 609",
+  "where": "satpambot.bot.modules.discord_bot.cogs.a01_xp_checkpoint_discord_backend:emit",
+  "time": 1760502993.7017865,
+  "diagnosis": {
+    "note": "Groq disabled or not configured."
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "fdfcf735bf47",
+  "created_at": 1760503514.8520849,
+  "status": "diagnosed",
+  "level": "WARNING",
+  "message": "[dm_muzzle] ACTIVE with mode='log' — DMs will not reach users.",
+  "where": "satpambot.bot.modules.discord_bot.cogs.dm_muzzle:setup",
+  "time": 1760503514.8520849,
+  "diagnosis": {
+    "note": "Groq disabled or not configured."
+  }
+}

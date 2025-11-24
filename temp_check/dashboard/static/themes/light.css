@@ -1,0 +1,4 @@
+:root{--bg:#f5f7fb;--panel:#fff;--text:#1a1d2b;--muted:#6a6f85;--primary:#6b5bff;--radius:14px;}
+body{color:var(--text);} .topbar,.sidebar{background:var(--panel);} .card{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:var(--radius);}
+.grid{display:grid;gap:14px;} .grid.cols-4{grid-template-columns:repeat(4,1fr);} .grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.chart-xs{height:110px}.chart-sm{height:160px}.chart-md{height:210px}.chart-lg{height:260px}.center-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800}

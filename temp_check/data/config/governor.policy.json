@@ -1,0 +1,10 @@
+{
+  "min_label": "MAGANG-S1",
+  "qna_public_gate": "controlled",
+  "persona_enable_after": "MAGANG-S1",
+  "use_jaison_if_available": false,
+  "throttle": {
+    "qna_per_hour": 2,
+    "qna_min_interval_sec": 900
+  }
+}

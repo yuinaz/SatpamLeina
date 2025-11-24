@@ -1,0 +1,11 @@
+
+services:
+- type: worker
+  name: leina-worker
+  env: python
+  plan: free
+  buildCommand: pip install -r requirements.txt
+  startCommand: python -m scripts.start_render
+  envVars:
+  - key: SERVICE_MODE
+    value: worker

@@ -1,0 +1,10 @@
+
+llm:
+  provider_priority: [groq, gemini]
+  temperature: 0.6
+  max_tokens: 1024
+  system_prompt: "file:satpambot/config/prompts/system.md"
+memory:
+  short_term: {enabled: true, per_user_limit: 3, ttl_sec: 900}
+cache:
+  qna: {enabled: true, ttl_sec: 300}

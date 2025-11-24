@@ -1,0 +1,14 @@
+{
+  "daily_report": {
+    "enabled": true,
+    "hour": 15
+  },
+  "weekly_report": {
+    "enabled": true,
+    "day_of_week": "mon",
+    "hour": 17,
+    "min_history_days": 7,
+    "suppress_if_zero": true,
+    "window_days": 7
+  }
+}

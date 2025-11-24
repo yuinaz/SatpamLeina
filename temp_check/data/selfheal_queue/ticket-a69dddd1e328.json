@@ -1,0 +1,12 @@
+{
+  "id": "a69dddd1e328",
+  "created_at": 1760503515.5913064,
+  "status": "diagnosed",
+  "level": "WARNING",
+  "message": "[selfheal] setup failed: Cog named 'SelfHealAutoFix' already loaded",
+  "where": "modules.discord_bot.cogs.selfheal_autofix:setup",
+  "time": 1760503515.5913064,
+  "diagnosis": {
+    "note": "Groq disabled or not configured."
+  }
+}

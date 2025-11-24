@@ -1,0 +1,20 @@
+{% extends 'base.html
+{% block title %}📝 Editor main.py{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="/dashboard" class="btn btn-outline-light">⬅️ Dashboard</a>
+    <h3>📝 Editor Kode main.py</h3>
+    <span class="text-muted">👤 {{ session.username }}</span>
+  </div>
+  {% if message %}
+    <div class="alert alert-info">{{ message }}</div>
+  {% endif %}
+  <form method="POST" action="/editor/save">
+    <div class="mb-3">
+      <textarea name="code" class="form-control" style="height: 600px; font-family: monospace;">{{ code }}</textarea>
+    </div>
+    <button type="submit" class="btn btn-success">💾 Simpan</button>
+  </form>
+</div>
+{% endblock %}

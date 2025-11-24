@@ -1,0 +1,12 @@
+{
+  "id": "01b4821655ac",
+  "created_at": 1760503514.3868852,
+  "status": "diagnosed",
+  "level": "WARNING",
+  "message": "[autoload_plus] skip satpambot.bot.modules.discord_bot.cogs.a03_owner_notify_redirect_thread: Extension 'satpambot.bot.modules.discord_bot.cogs.a03_owner_notify_redirect_thread' is already loaded.",
+  "where": "satpambot.bot.modules.discord_bot.cogs.a00_overlay_autoload_plus:cog_load",
+  "time": 1760503514.3868852,
+  "diagnosis": {
+    "note": "Groq disabled or not configured."
+  }
+}

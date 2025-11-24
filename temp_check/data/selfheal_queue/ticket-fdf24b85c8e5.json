@@ -1,0 +1,12 @@
+{
+  "id": "fdf24b85c8e5",
+  "created_at": 1760503515.072788,
+  "status": "diagnosed",
+  "level": "WARNING",
+  "message": "[neuro_gov_bootstrap] enabling Neuro Governor…",
+  "where": "satpambot.bot.modules.discord_bot.cogs.neuro_governor_bootstrap:setup",
+  "time": 1760503515.0717921,
+  "diagnosis": {
+    "note": "Groq disabled or not configured."
+  }
+}

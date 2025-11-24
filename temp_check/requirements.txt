@@ -1,0 +1,26 @@
+# unified, conflict-free (NumPy < 2.3 due to OpenCV 4.12.0.88)
+Flask==3.1.2
+flask-socketio==5.5.1
+gunicorn==23.0.0; sys_platform != "win32"
+discord.py==2.6.3
+aiohttp==3.13.0
+python-dotenv==1.1.1
+requests==2.32.3
+httpx==0.28.1
+tldextract==5.3.0
+aiosqlite==0.21.0
+psutil==7.1.0
+tzdata>=2025.2
+Pillow==11.3.0
+numpy==2.2.6
+opencv-python-headless==4.12.0.88
+google-genai>=1.44.0
+groq>=0.32,<1.0
+google-generativeai>=0.7.2
+googletrans-py>=4.0.0
+deep-translator>=1.11.4
+langdetect>=1.0.9
+pydantic==2.11.10
+tenacity>=8.2.3
+edge-tts
+pyyaml>=6.0

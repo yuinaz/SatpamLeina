@@ -1,0 +1,19 @@
+{% extends 'base.html
+{% block title %}Ganti Tema - SatpamBot{% endblock %}
+{% block content %}
+<div class="card" style="padding:16px; max-width: 640px;">
+  <h4 style="margin-bottom:12px;">Ganti Theme</h4>
+  <form method="POST" class="row g-2" style="display:flex;gap:10px;align-items:center;">
+    <select name="theme" class="form-select" style="max-width:280px;">
+      {% for t in available_themes %}
+        <option value="{{ t }}" {% if t == current_theme %}selected{% endif %}>{{ t }}</option>
+      {% endfor %}
+    </select>
+    <button class="btn btn-primary" type="submit">Simpan</button>
+    <a class="btn btn-outline-secondary" href="/theme?set={{ current_theme or 'neon.css' }}">Apply</a>
+  </form>
+  <div style="margin-top:10px;">
+    <small class="text-muted">File dibaca dari <code>/static/themes/*.css</code>. Background global tetap.</small>
+  </div>
+</div>
+{% endblock %}

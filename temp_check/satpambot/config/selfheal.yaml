@@ -1,0 +1,61 @@
+
+selfheal:
+  enabled: true
+  approvals_required: false
+  github:
+    push_enabled: false      # set true jika sudah isi token & repo
+    repo: ""
+    branch: "main"
+  restart:
+    mode: graceful           # graceful|hard|process-exit
+    debounce_sec: 10
+
+  watchers:
+    # 1) Upstash event signature mismatch → normalizer overlay
+    - id: xp_upstash_signature
+      match: 'TypeError: UpstashExactKeysOverlay\.on_satpam_xp\(\) takes .* given .*'
+      action: patch
+      module: "satpambot.bot.modules.discord_bot.cogs.a06_xp_upstash_args_normalizer_overlay"
+      patch: "enable"
+      restart_on_apply: false
+
+    # 2) Upstash value JSON string → int-ish parser
+    - id: upstash_json_int
+      match: 'ValueError: invalid literal for int\(\).*senior_total_xp'
+      action: patch
+      module: "satpambot.bot.modules.discord_bot.cogs.a06_upstash_intish_parser_overlay"
+      patch: "install"
+      restart_on_apply: false
+
+    # 3) EmbedScribe missing .post() → shim ke .upsert()/.write()
+    - id: embed_scribe_post
+      match: "'EmbedScribe' object has no attribute 'post'"
+      action: patch
+      module: "satpambot.bot.modules.discord_bot.cogs.a06_embed_scribe_compat_overlay"
+      patch: "add_post_shim"
+      restart_on_apply: false
+
+    # 4) Import alias miss (modules.* vs satpambot.*) → alias overlay
+    - id: modules_alias_miss
+      match: 'ImportError: cannot import name ''.*'' from ''modules\.discord_bot\.cogs'''
+      action: load_first
+      module: "satpambot.bot.modules.discord_bot.cogs.a00_import_compat_alias_overlay"
+      patch: "ensure_alias"
+      restart_on_apply: false
+
+    # 5) Cog duplicate loaded → dedupe manager
+    - id: cog_already_loaded
+      match: 'ClientException\(\'Cog named ''''.*'''' already loaded\"\)''
+      action: patch
+      module: 'satpambot.bot.modules.discord_bot.cogs.a00_selfheal_dedupe_manager"
+      patch: "unload_duplicate'
+      restart_on_apply: false
+
+    # 6) Progress embed solo error (alias ke 3)
+    - id: progress_embed_post
+      match: ''\[progress_embed_solo\] update error: ''''EmbedScribe'''' object has no attribute ''''post''''''
+      action: patch
+      module: 'satpambot.bot.modules.discord_bot.cogs.a06_embed_scribe_compat_overlay"
+      patch: "add_post_shim"
+      restart_on_apply: false
+

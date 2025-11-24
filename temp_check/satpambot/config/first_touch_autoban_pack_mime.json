@@ -1,0 +1,19 @@
+{
+  "enabled": true,
+  "exempt_threads": true,
+  "only_roleless": false,
+  "exempt_role_ids": [],
+  "exempt_role_names": [],
+  "whitelist_channels": [],
+
+  "pattern_pack_min_attachments": 3,
+  "pattern_pack_allow_image_prefix": true,
+  "pattern_pack_exts": ["jpg", "jpeg", "png", "gif", "webp"],
+  "require_consecutive_numbers": true,
+
+  "mime_direct_ban_min_mismatches": 3,
+  "image_kinds": ["jpeg", "png", "webp", "gif"],
+
+  "log_channel_id": 0,
+  "delete_message_days": 7
+}

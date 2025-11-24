@@ -1,0 +1,52 @@
+{% extends 'base.html
+{% block title %}🧠 Image Classifier (Scam Patterns){% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="/dashboard" class="btn btn-outline-light">⬅️ Dashboard</a>
+    <h3>🧠 Image Classifier (Scam Patterns)</h3>
+    <a href="/security" class="btn btn-outline-light">Security</a>
+  </div>
+
+  {% if msg %}<div class="alert alert-success">{{ msg }}</div>{% endif %}
+
+  <div class="card bg-dark text-light mb-3">
+    <div class="card-header">Tambah Exemplar</div>
+    <div class="card-body">
+      <form method="post" enctype="multipart/form-data">
+        <div class="row g-2">
+          <div class="col-md-4">
+            <select name="label" class="form-select">
+              <option value="scam" selected>scam (positif)</option>
+              <option value="normal">normal (negatif)</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <input type="file" name="image" class="form-control" accept="image/*" required>
+          </div>
+          <div class="col-md-2">
+            <button class="btn btn-primary w-100">➕ Tambah</button>
+          </div>
+        </div>
+        <div class="form-text mt-2">Tambahkan beberapa contoh **scam** (mis. template “MrBeast $2500”) dan beberapa **normal**.</div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card bg-dark text-light">
+    <div class="card-header">Dataset Ringkas</div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <h6>Scam Exemplars: {{ db.scam|length if db.scam is defined else db['scam']|length }}</h6>
+        </div>
+        <div class="col-md-6">
+          <h6>Normal Exemplars: {{ db.normal|length if db.normal is defined else db['normal']|length }}</h6>
+        </div>
+      </div>
+      <div class="text-muted">Embeddings disimpan ke <code>data/ic_embeddings.json</code>. Threshold & action atur di ENV: <code>IC_THRESHOLD</code>, <code>IC_ACTION</code>.</div>
+      <a class="btn btn-outline-light mt-2" href="/security">Buka Security</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

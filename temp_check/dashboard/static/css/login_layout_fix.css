@@ -1,0 +1,9 @@
+/* Force-center login even if template is bare-bones */
+:root{ --gap:16px }
+html,body{height:100%}
+body{margin:0}
+.login-page,.login-center{
+  min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+}
+.login-center .card, .login-card{ width:min(430px, 94vw); }
+form.login-form{ display:grid; gap: var(--gap); }

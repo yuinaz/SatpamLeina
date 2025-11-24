@@ -1,0 +1,7 @@
+{% extends 'base.html
+{% block title %}SatpamBot Loading{% endblock %}
+{% block content %}
+<img src="{{ url_for('static', filename=config.get('LOGO_FILENAME', 'bot_avatar.gif')) }}" alt="Bot Logo" class="logo">
+  <div class="title">Selamat datang di SatpamBot</div>
+  <a href="/dashboard"><button class="enter-btn">Masuk Dashboard</button></a>
+{% endblock %}

@@ -1,0 +1,17 @@
+
+/* Simple dark theme reminiscent of the provided mock */
+:root{--card: rgba(255,255,255,.06); --blur: blur(8px); --muted:#a3b2d5}
+body{background: radial-gradient(1200px 600px at 0% 0%, #21345b 0%, transparent 45%),
+             radial-gradient(900px 500px at 100% 0%, #4f2c88 0%, transparent 50%),
+             #0b1020; color:#e5e7eb}
+.topnav{background:rgba(0,0,0,.28); backdrop-filter:var(--blur)}
+.card{background:var(--card); backdrop-filter:var(--blur)}
+.metric{background:var(--card);}
+a{color:#c6dafb}
+
+
+/* micro-shadow & spacing tweaks */
+:root{ --card-shadow: 0 10px 30px rgba(0,0,0,.35); --card-radius: 18px; }
+.card{ box-shadow: var(--card-shadow); border-radius: var(--card-radius); }
+.nav a:hover{ box-shadow: 0 8px 26px rgba(30,64,175,.35); }
+.btn{ box-shadow: 0 6px 18px rgba(59,130,246,.25); }

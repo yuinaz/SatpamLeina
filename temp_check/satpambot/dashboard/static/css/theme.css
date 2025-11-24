@@ -1,0 +1,125 @@
+/* === Global Reset === */
+body {
+    background-color: #1b1b2f;
+    color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* === Navbar / Header === */
+.navbar {
+    background-color: #27293d;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.navbar-brand, .nav-link {
+    color: #fff !important;
+}
+
+.navbar-brand:hover, .nav-link:hover {
+    color: #4e94ff !important;
+}
+
+/* === Sidebar === */
+.sidebar {
+    background-color: #202233;
+    min-height: 100vh;
+    padding-top: 20px;
+    position: fixed;
+    width: 240px;
+}
+
+.sidebar a {
+    display: block;
+    color: #c0c0c0;
+    padding: 15px;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+    background-color: #4e94ff;
+    color: #fff;
+    border-left: 4px solid #00ffd5;
+}
+
+/* === Main Content Area === */
+.main-content {
+    margin-left: 240px;
+    padding: 30px;
+    background-color: #1b1b2f;
+    min-height: 100vh;
+}
+
+/* === Cards === */
+.card {
+    background-color: #2e3047;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0,255,255,0.1);
+    transition: transform 0.2s ease;
+    color: #ffffff;
+}
+
+.card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(78,148,255,0.3);
+}
+
+/* === Buttons === */
+.btn-primary {
+    background-color: #4e94ff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+}
+
+.btn-primary:hover {
+    background-color: #1e78ff;
+}
+
+/* === Input Fields === */
+.form-control {
+    background-color: #2e3047;
+    border: 1px solid #4e94ff;
+    color: white;
+}
+
+.form-control:focus {
+    background-color: #2e3047;
+    border-color: #00ffd5;
+    box-shadow: 0 0 5px #00ffd5;
+    color: white;
+}
+
+/* === Chart Container === */
+#chart-container {
+    background: #2e3047;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,255,255,0.05);
+}
+
+/* === Table Styling (optional) === */
+.table-dark th,
+.table-dark td {
+    background-color: #2e3047 !important;
+    color: #fff;
+    border-color: #444;
+}
+
+/* === Footer (optional) === */
+.footer {
+    color: #888;
+    font-size: 14px;
+    text-align: center;
+    padding: 10px;
+}
+
+/* === Neon Accent === */
+.neon-text {
+    color: #00ffd5;
+    text-shadow: 0 0 5px #00ffd5, 0 0 10px #00ffd5;
+}

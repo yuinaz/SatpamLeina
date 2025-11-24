@@ -1,0 +1,18 @@
+{
+  "tk_levels": [
+    0,
+    0
+  ],
+  "sd_levels": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "public_allowed": false,
+  "last_prompt_at": 0.0,
+  "shadow_seen": 0,
+  "shadow_correct": 0
+}

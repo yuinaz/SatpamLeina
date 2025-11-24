@@ -1,0 +1,12 @@
+{
+  "id": "5c56bcc3a56d",
+  "created_at": 1760503514.315142,
+  "status": "diagnosed",
+  "level": "WARNING",
+  "message": "add_cog failed for QnaDualProvider: ClientException(\"Cog named 'QnaDualProvider' already loaded\")",
+  "where": "a00_fix_failed_cogs_overlay:_safe_add",
+  "time": 1760503514.31414,
+  "diagnosis": {
+    "note": "Groq disabled or not configured."
+  }
+}

@@ -1,0 +1,11 @@
+
+/* Live animated nebula background */
+body.live-bg::before{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:-1;
+  background: radial-gradient(800px 400px at 10% 10%, rgba(255,42,161,.12), transparent),
+             radial-gradient(1000px 600px at 80% 0%, rgba(125,211,252,.12), transparent),
+             radial-gradient(800px 400px at 60% 90%, rgba(255,209,102,.10), transparent),
+             linear-gradient(180deg, #0e0c1a, #0b0a17 60%);
+  animation: drift 18s ease-in-out infinite alternate;
+}
+@keyframes drift{ 0%{ filter:hue-rotate(0deg) brightness(1) } 100%{ filter:hue-rotate(20deg) brightness(1.05) } }

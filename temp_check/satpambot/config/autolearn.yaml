@@ -1,0 +1,6 @@
+autolearn:
+  enabled: true
+  patterns:
+    - type: qa
+      regex: '^Q:\\s*(.+)$'
+      answer_embed: true

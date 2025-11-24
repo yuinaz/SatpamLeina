@@ -1,0 +1,8 @@
+
+/* Aromax-inspired cyberpunk theme */
+:root{ --bg:#0e0c1a; --panel:#17152a; --panel-2:#1f1b38; --text:#e9e9f0; --muted:#a19bbf; --primary:#ff2aa1; --primary-2:#7dd3fc; --accent:#ffd166; --card:#15122a; --border:#2c2848; --shadow:rgba(0,0,0,0.4); }
+body{ background-color:var(--bg); color:var(--text); font-family:Inter,Segoe UI,Roboto,Arial,sans-serif; }
+.card{ background:linear-gradient(180deg,var(--panel),var(--card)); border:1px solid var(--border); box-shadow:0 10px 30px var(--shadow); border-radius:18px;}
+.navbar{ background:linear-gradient(90deg,var(--panel),var(--panel-2)); border-bottom:1px solid var(--border); }
+.btn-primary{ background:var(--primary); border:none; } .btn-outline-light{ border-color:var(--primary); color:var(--text); }
+a{ color:var(--primary-2); } .badge{ background:var(--panel-2); border:1px solid var(--border); } h1,h2,h3,h4{ letter-spacing:.5px }

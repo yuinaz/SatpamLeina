@@ -1,0 +1,12 @@
+{
+  "id": "2a3adc3b2187",
+  "created_at": 1760503514.3171306,
+  "status": "diagnosed",
+  "level": "WARNING",
+  "message": "[failed_cogs_fix] nothing loaded",
+  "where": "a00_fix_failed_cogs_overlay:setup",
+  "time": 1760503514.3171306,
+  "diagnosis": {
+    "note": "Groq disabled or not configured."
+  }
+}

@@ -1,0 +1,57 @@
+{% set cb = cache_bust|default(0) %}
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <title>Moderation • SatpamBot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/static/css/theme.css?v={{ cb }}">
+  <link rel="stylesheet" href="/dashboard/dashboard-static/css/layout_compact.css">
+  <link rel="stylesheet" href="/static/css/dashboard.css?v={{ cb }}">
+  <link rel="stylesheet" href="/static/css/custom.css?v={{ cb }}">
+  <link rel="stylesheet" href="/static/css/responsive.css?v={{ cb }}">
+  <style>
+    .panel{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    @media(max-width:920px){.row{grid-template-columns:1fr}}
+    .drop{border:2px dashed #94a3b8;border-radius:12px;padding:22px;text-align:center;background:#f8fafc}
+    .list{max-height:260px;overflow:auto;border:1px solid #e5e7eb;border-radius:10px;padding:10px;background:#f9fafb}
+    input[type=text]{border:1px solid #e5e7eb;border-radius:8px;padding:10px;width:100%}
+    button{border:0;border-radius:8px;padding:10px 12px;background:#2563eb;color:#fff;cursor:pointer}
+    .muted{color:#64748b;font-size:12px}
+  </style>
+</head>
+<body>
+  <div id="app-shell" class="container">
+    <h1>Moderation</h1>
+    <div class="row">
+      <div class="panel">
+        <h2>Whitelist</h2>
+        <p class="muted">Tambahkan User ID agar tidak terbanned otomatis.</p>
+        <div style="display:flex;gap:10px;margin:8px 0">
+          <input id="wl-input" type="text" placeholder="User ID (pisah dengan koma untuk banyak)">
+          <button onclick="WL.add()">Tambah</button>
+        </div>
+        <div class="list"><ul id="wl-list" style="margin:0;padding-left:20px"></ul></div>
+      </div>
+      <div class="panel">
+        <h2>Drag & Drop Bukti Phishing</h2>
+        <p class="muted">Seret gambar ke area ini, isi User ID & alasan, lalu kirim. Bot akan memproses & ban jika tidak di-whitelist.</p>
+        <div class="drop" id="drop">
+          <input type="file" id="file" accept="image/*" style="display:none">
+          <p id="dropNote">Lepaskan gambar di sini atau klik untuk memilih.</p>
+        </div>
+        <div style="display:flex;gap:10px;margin:10px 0">
+          <input id="target_id" type="text" placeholder="User ID target">
+          <input id="reason" type="text" placeholder="Alasan (opsional)">
+          <button onclick="UP.send()">Kirim</button>
+        </div>
+        <div id="status" class="muted"></div>
+      </div>
+    </div>
+  </div>
+  <script src="/dashboard-extras-static/moderation.js?v={{ cb }}"></script>
+<script src="/dashboard/dashboard-static/js/compact_layout.js"></script>
+<script src="/dashboard/dashboard-static/js/remove_option_button.js"></script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+{
+  "autoban": false,
+  "threshold": 8,
+  "log_thread_name": "Ban Log"
+}

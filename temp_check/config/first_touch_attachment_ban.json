@@ -1,0 +1,42 @@
+{
+  "safety_required": true,
+  "reference_required_for_ban": true,
+  "reference_thread_name": "imagephising",
+  "reference_cache_minutes": 15,
+
+  "phash_min_threshold": 0.9,
+  "phash_strong_threshold": 0.93,
+
+  "log_channel_id": 0,
+  "fp_log_thread_name": "ftab-fp-review",
+  "ban_log_thread_name": "ftab-ban-log",
+  "whitelist_thread_name": "ftab-whitelist",
+
+  "whitelist_file": "config/image_whitelist_sha256.json",
+  "skip_logging_if_whitelisted": true,
+  "auto_whitelist_enabled": true,
+  "auto_whitelist_if_phash_below": 0.85,
+  "auto_whitelist_log_to_thread": true,
+
+  "auto_delete_logs_enabled": true,
+  "auto_delete_logs_seconds": 600,
+  "auto_delete_fp_thread": true,
+  "auto_delete_whitelist_thread": true,
+  "auto_delete_ban_thread": false,
+  "auto_delete_parent_log_channel": false,
+
+  "preemptive_timeout_enabled": true,
+  "preemptive_timeout_seconds": 300,
+
+  "pattern_pack_ban_enabled": true,
+  "pattern_pack_direct_ban": false,
+  "pattern_pack_min_attachments": 3,
+  "pattern_pack_digits": [1, 2, 3, 4, 5, 6],
+  "pattern_pack_allow_image_prefix": true,
+  "pattern_pack_exts": ["jpg", "jpeg", "png", "webp"],
+
+  "mime_sniff_enabled": true,
+  "mime_direct_ban_enabled": false,
+  "mime_direct_ban_min_mismatches": 3,
+  "image_kinds": ["jpeg", "png", "webp", "gif"]
+}

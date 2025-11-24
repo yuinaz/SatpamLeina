@@ -1,0 +1,21 @@
+:root { --auth-max: 380px; }
+html, body { height: 100%; }
+.auth-wrap{
+  position:relative; height:100vh; width:100%;
+  overflow:hidden; display:flex; align-items:center; justify-content:center;
+  background: radial-gradient(1200px 600px at 10% 10%, rgba(255,255,255,.06), transparent),
+              radial-gradient(900px 500px at 90% 90%, rgba(0,123,255,.06), transparent),
+              #0f1115;
+}
+#particle-canvas{
+  position:absolute; inset:0; width:100%; height:100%; display:block; z-index:0;
+}
+.login-card{
+  z-index:1; width:100%; max-width:var(--auth-max);
+  backdrop-filter: blur(6px);
+  background: rgba(15,17,21,.6);
+  border: 1px solid rgba(255,255,255,.08);
+  color: #e7e7e7;
+}
+.form-control-lg{ font-size:1rem; padding:.7rem .9rem; }
+.btn-lg{ padding:.7rem .9rem; }

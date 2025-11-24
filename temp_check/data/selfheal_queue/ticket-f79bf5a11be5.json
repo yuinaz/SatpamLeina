@@ -1,0 +1,12 @@
+{
+  "id": "f79bf5a11be5",
+  "created_at": 1760503526.627222,
+  "status": "diagnosed",
+  "level": "WARNING",
+  "message": "[xp-awarder] No direct XP method found. Will dispatch events: 'xp_add', 'xp.award', 'satpam_xp'.",
+  "where": "satpambot.bot.modules.discord_bot.cogs.a08_xp_message_awarder_overlay:_resolve",
+  "time": 1760503526.6262174,
+  "diagnosis": {
+    "note": "Groq disabled or not configured."
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "a533c68dcf92",
+  "created_at": 1760503514.3016315,
+  "status": "diagnosed",
+  "level": "WARNING",
+  "message": "add_cog failed for PhishLogStickyGuard: ClientException(\"Cog named 'PhishLogStickyGuard' already loaded\")",
+  "where": "a00_fix_failed_cogs_overlay:_safe_add",
+  "time": 1760503514.3016315,
+  "diagnosis": {
+    "note": "Groq disabled or not configured."
+  }
+}

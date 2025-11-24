@@ -1,0 +1,4 @@
+:root{--bg:#0e0f19;--panel:#1c1f2e;--text:#eaeaf2;--muted:#9aa0b4;--primary:#3aa0ff;--radius:14px;}
+body{color:var(--text);} .topbar,.sidebar{background:var(--panel);} .card{background:#191b29;border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);}
+.grid{display:grid;gap:14px;} .grid.cols-4{grid-template-columns:repeat(4,1fr);} .grid.cols-3{grid-template-columns:repeat(3,1fr);}
+.chart-xs{height:110px}.chart-sm{height:160px}.chart-md{height:210px}.chart-lg{height:260px}.center-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800}

@@ -1,0 +1,11 @@
+{
+  "compiled_ok": [
+    "satpambot/bot/modules/discord_bot/cogs/neuro_memory_core.py",
+    "satpambot/bot/modules/discord_bot/cogs/neuro_autolearn_moderated_v2.py",
+    "satpambot/bot/modules/discord_bot/cogs/neuro_curriculum_bridge.py",
+    "satpambot/bot/modules/discord_bot/cogs/neuro_shadow_bridge.py",
+    "satpambot/bot/modules/discord_bot/cogs/neuro_governor_levels.py",
+    "satpambot/bot/llm/groq_client.py"
+  ],
+  "errors": []
+}

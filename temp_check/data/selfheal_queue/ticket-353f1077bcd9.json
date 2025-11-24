@@ -1,0 +1,12 @@
+{
+  "id": "353f1077bcd9",
+  "created_at": 1760503514.3939667,
+  "status": "diagnosed",
+  "level": "WARNING",
+  "message": "[autoload_plus] skip satpambot.bot.modules.discord_bot.cogs.admin_interview_gate: Extension 'satpambot.bot.modules.discord_bot.cogs.admin_interview_gate' is already loaded.",
+  "where": "satpambot.bot.modules.discord_bot.cogs.a00_overlay_autoload_plus:cog_load",
+  "time": 1760503514.3939667,
+  "diagnosis": {
+    "note": "Groq disabled or not configured."
+  }
+}

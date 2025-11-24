@@ -1,0 +1,40 @@
+{
+  "base": "https://raw.githubusercontent.com/yuinaz/discord-bot-railway/main/",
+  "archive": "https://codeload.github.com/yuinaz/discord-bot-railway/zip/refs/heads/main",
+  "repo_root_prefix": "discord-bot-railway-main/",
+  "pull_sets": [
+    {
+      "include": [
+        "config/"
+      ],
+      "allow_exts": [
+        "json",
+        "txt",
+        "yaml",
+        "yml"
+      ]
+    },
+    {
+      "include": [
+        "satpambot/"
+      ],
+      "allow_exts": [
+        "py",
+        "json",
+        "txt",
+        "yaml",
+        "yml"
+      ]
+    },
+    {
+      "include": [
+        ""
+      ],
+      "allow_exts": [
+        "py"
+      ]
+    }
+  ],
+  "files": [],
+  "timeout_s": 20
+}

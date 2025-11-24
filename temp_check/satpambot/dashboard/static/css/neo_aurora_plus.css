@@ -1,0 +1,13 @@
+
+.neo-bg{min-height:100vh;background: radial-gradient(80rem 40rem at 0% 0%, #1f3b7b 0%, transparent 40%), radial-gradient(60rem 30rem at 100% 0%, #7b1f7a 0%, transparent 40%), #0b1020; color:#e5e7eb; font-family:system-ui,Segoe UI,Arial; margin:0}
+.topnav{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:rgba(0,0,0,.25);backdrop-filter:blur(8px);position:sticky;top:0}
+.topnav .links a{margin-left:16px;color:#cbd5e1;text-decoration:none}
+.topnav .brand{display:flex;gap:8px;align-items:center;color:#fff}
+.container{max-width:1200px;margin:20px auto;padding:0 16px}
+.metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin:14px 0}
+.metric{position:relative;background:rgba(255,255,255,.06);backdrop-filter:blur(6px);padding:14px;border-radius:14px}
+.metric .label{opacity:.8;font-size:.9rem}
+.metric .value{font-size:28px;font-weight:700}
+.metric .suffix{position:absolute;right:12px;bottom:10px;opacity:.7;font-size:.9rem}
+.card{background:rgba(255,255,255,.06);backdrop-filter:blur(6px);padding:16px;border-radius:16px;margin:16px 0}
+.dropzone{background:rgba(0,0,0,.25); border:1px dashed rgba(255,255,255,.35); border-radius:10px; padding:30px; text-align:center; color:#cbd5e1; cursor:pointer}

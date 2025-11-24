@@ -1,0 +1,11 @@
+<!-- Phish Lab Dropzone -->
+<section id="phish-lab" class="card-dark" style="margin-bottom:16px;">
+  <div id="dropzone" class="dropzone" tabindex="0" aria-label="Drop images here">
+    <div class="dz-label">Drop files here...</div>
+  </div>
+  <div id="dz-result" class="dz-result"></div>
+</section>
+<link rel="stylesheet" href="{{ url_for('dashboard.static', filename='css/phish_lab.css') }}{% if cache_bust %}?v={{ cache_bust }}{% endif %}">
+<script src="{{ url_for('dashboard.static', filename='js/dragdrop_phash.js') }}{% if cache_bust %}?v={{ cache_bust }}{% endif %}"></script>
+
+<script src="/dashboard-static/js/phash_poller.js?v={{ cache_bust }}"></script>

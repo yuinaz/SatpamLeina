@@ -1,0 +1,198 @@
+
+{% extends "base_gtake.html" %}
+{% block content %}
+<div class="cards">
+      <article class="card"><h3>Activity (60fps)</h3><canvas id="activityChart" width="900" height="180"></canvas></article>
+      <div class="card" style="grid-column: 1 / -1;">
+        <div class="mini-monitor">
+          <div class="flex" style="gap:24px">
+            <div><div class="muted">Guilds</div><div id="live-guilds" style="font-weight:700">--</div></div>
+            <div><div class="muted">Members</div><div id="live-members" style="font-weight:700">--</div></div>
+            <div><div class="muted">Online</div><div id="live-online" style="font-weight:700">--</div></div>
+            <div><div class="muted">Channels</div><div id="live-channels" style="font-weight:700">--</div></div>
+            <div><div class="muted">Threads</div><div id="live-threads" style="font-weight:700">--</div></div>
+            <div><div class="muted">Latency</div><div id="live-lat" style="font-weight:700">-- ms</div></div>
+          </div>
+          <div class="muted">Real-time counters</div>
+        </div>
+      </div>
+  <div>
+    <div class="card">
+          <div id="dashDrop" class="dropzone" style="border:2px dashed rgba(255,255,255,.2);padding:1rem;border-radius:.75rem">Drop files here…</div>
+          <input id="dashPick" type="file" style="display:none" />
+      <h3></header>
+
+<!-- v17: Two-column Phish Tools (files left, links right) -->
+<link rel="stylesheet" href="{{ url_for('dashboard.static', filename='css/phish_lab.css') }}">
+<section class="grid" style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px">
+  <div>
+    {% include 'components/phish_dropzone.html' %}
+  </div>
+  <div class="card list" style="background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); border-radius:12px; padding:12px">
+    <div class="dz-label" style="margin-bottom:8px">Paste/drag URLs here (one per line), then click Hash</div>
+    <textarea id="link-box" style="width:100%; height:90px; background:rgba(255,255,255,.06); color:#d1d5e7; border:1px solid rgba(255,255,255,.08); border-radius:8px; padding:8px"></textarea>
+    <div style="display:flex; gap:10px; margin-top:8px; align-items:center">
+      <button id="hash-links" class="btn">Hash</button>
+      <span class="muted">Maks 20 link</span>
+    </div>
+    <div id="dz-links" class="dz-result" style="margin-top:8px"></div>
+  </div>
+</section>
+
+<!-- v17: User Terbanned (Live) -->
+<section class="card list" style="background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); border-radius:12px; padding:12px">
+  <div class="dz-label">User Terbanned (Live)</div>
+  <div id="bans" class="dz-result"></div>
+</section>
+
+<script>
+(function(){
+  function esc(s){ return (s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
+  const btn = document.getElementById('hash-links');
+  const box = document.getElementById('link-box');
+  const out = document.getElementById('dz-links');
+  if(btn && box && out){
+    btn.addEventListener('click', ()=>{
+      const urls = box.value.split(/\\r?\\n/).map(s=>s.trim()).filter(Boolean).slice(0,20);
+      fetch('/dashboard/api/phash/url', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({urls})})
+        .then(r=>r.json()).then(j=>{
+          if(j.error){ out.insertAdjacentHTML('afterbegin', `<div class="dz-item" style="color:#ef4444">${esc(j.error)}</div>`); return; }
+          (j.added||[]).forEach(it=> out.insertAdjacentHTML('afterbegin', `<div class="dz-item">✔️ <span class="hash">${esc(it.hash)}</span> <span class="muted">(${esc(it.source||'url')})</span></div>`));
+          (j.skipped||[]).forEach(h=> out.insertAdjacentHTML('afterbegin', `<div class="dz-item">⚠️ skip <span class="hash">${esc(h)}</span></div>`));
+        }).catch(e=> out.insertAdjacentHTML('afterbegin', `<div class="dz-item" style="color:#ef4444">${esc(String(e))}</div>`));
+    });
+  }
+  const bans = document.getElementById('bans');
+  function pollBans(){
+    fetch('/dashboard/api/bans').then(r=>r.json()).then(d=>{
+      bans.innerHTML='';
+      (d.list||[]).slice(-100).reverse().forEach((b,i)=>{
+        const line = `${i+1}. <span class='hash'>@${esc(b.user||'user')}</span> <span class='muted'>${esc(b.date||'')}</span>`;
+        bans.insertAdjacentHTML('afterbegin', `<div class="dz-item">${line}</div>`);
+      });
+    }).catch(()=>{});
+  }
+  setInterval(pollBans, 5000); pollBans();
+})();
+</script>
+gs Simple!</h3>
+      <div class="muted">Management and planning in a simple and attractive style will bring you success</div>
+      <div style="margin-top:12px" class="flex">
+        <a class="btn" href="#">To do</a>
+        <a class="btn" href="#">Work</a>
+        <a class="btn" href="#">High priority</a>
+      </div>
+    </div>
+    <div class="card list" id="dropzone">
+      <div class="item">
+        <div class="flex" style="justify-content:space-between">
+          <div>
+            <div><b>Meeting with pela members</b></div>
+            <div class="muted">08:00 AM – 10:00 AM</div>
+          </div>
+          <div class="muted">+4 people</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="flex" style="justify-content:space-between">
+          <div>
+            <div><b>Design System</b></div>
+            <div class="muted">08:00 AM – 03:00 PM</div>
+          </div>
+          <div class="muted">6 files</div>
+        </div>
+      </div>
+      <div class="item">
+        <div class="flex" style="justify-content:space-between">
+          <div>
+            <div><b>Meeting With The Sales Team</b></div>
+            <div class="muted">11:00 AM – 02:00 AM</div>
+          </div>
+          <div class="muted">+2 people</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="card">
+      <div class="mini-monitor">
+        <div><b>Mini Monitor <small class="muted">(real-time)</small></b><div id="mm-uptime" class="muted">Uptime: <span id="mm-up-real">--</span> --</div></div>
+        <div style="text-align:right">
+          <div id="mm-cpu"><b>CPU: <span id="mm-cpu-real">--</span>%</b> --%</div>
+          <div id="mm-ram" class="muted">RAM: <span id="mm-ram-real">--</span>% -- MB</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>My files</h3>
+      <div class="muted">You have not added a file yet</div>
+      <div style="margin-top:12px">
+        <a class="btn" href="#">Add file</a>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Activity (60fps)</h3>
+      <div class="muted">13 Tasks Completed</div>
+      <canvas id="chart" width="400" height="120"></canvas>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block body_end %}
+<script>
+  // mini monitor
+  const start = Date.now();
+  setInterval(()=>{
+    const up = Math.floor((Date.now()-start)/1000);
+    document.getElementById('mm-uptime').textContent = 'Uptime: <span id="mm-up-real">--</span> '+up+'s';
+    document.getElementById('mm-cpu').textContent = 'CPU: <span id="mm-cpu-real">--</span>% '+(5 + Math.floor(Math.random()*20))+'%';
+    document.getElementById('mm-ram').textContent = 'RAM: <span id="mm-ram-real">--</span>% '+(300 + Math.floor(Math.random()*200))+' MB';
+  }, 1000);
+  // tiny sparkline
+  (function(){
+    const el = document.getElementById('spark');
+    if(!el) return;
+    const ctx = el.getContext('2d'); const W=el.width, H=el.height;
+    let t=0; function draw(){
+      ctx.clearRect(0,0,W,H);
+      ctx.beginPath(); ctx.moveTo(0, H*0.7);
+      for(let x=0; x<W; x++){
+        const y = H*0.7 - 30*Math.sin((x+t)/22) + 12*Math.cos((x+t)/9);
+        ctx.lineTo(x, y);
+      }
+      ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(147,197,253,.9)'; ctx.stroke();
+      t += 2; requestAnimationFrame(draw);
+    } draw();
+  })();
+
+      async function pollMetrics(){
+        try{
+          const r = await fetch('/dashboard/api/metrics');
+          const j = await r.json();
+          if(j && j.ok){
+            if(document.getElementById('mm-cpu-real')) document.getElementById('mm-cpu-real').textContent = (j.cpu||0).toFixed(0);
+            if(document.getElementById('mm-ram-real')) document.getElementById('mm-ram-real').textContent = (j.mem||0).toFixed(0);
+            if(document.getElementById('mm-up-real'))  document.getElementById('mm-up-real').textContent  = (j.uptime||0)+'s';
+            // chart
+            const el = document.getElementById('activityChart');
+            if(el){
+              const ctx = el.getContext('2d');
+              window.__spark = window.__spark || {t:0, arr:[]};
+              const a = window.__spark.arr;
+              a.push((j.cpu||0)); if(a.length>240) a.shift();
+              ctx.clearRect(0,0,el.width, el.height);
+              ctx.beginPath(); ctx.moveTo(0, el.height*0.7);
+              for(let x=0; x<el.width; x++){
+                const idx = Math.max(0, a.length - el.width + x);
+                const v = a[idx] || 0;
+                const y = el.height*0.8 - (v/100.0)*(el.height*0.6);
+                ctx.lineTo(x, y);
+              }
+              ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(147,197,253,.9)'; ctx.stroke();
+            }
+          }
+        }catch(e){}
+      }
+      setInterval(pollMetrics, 2000); pollMetrics();
+    </script>
+{% endblock %}

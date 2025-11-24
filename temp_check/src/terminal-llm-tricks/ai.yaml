@@ -1,0 +1,5 @@
+
+provider: auto
+groq_model: llama-3.1-70b-versatile
+gemini_model: gemini-1.5-flash
+cli_model: gpt-4o-mini

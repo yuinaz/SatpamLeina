@@ -1,0 +1,36 @@
+<<<<<<< HEAD
+name: Deploy Dashboard (manual)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Dashboard (placeholder)
+        run: |
+          echo "Add your dashboard deploy steps here."
+=======
+name: Deploy Dashboard (Render)
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'dashboard/**'
+      - '.github/workflows/deploy-dashboard.yml'
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    concurrency: { group: render-dashboard, cancel-in-progress: true }
+    steps:
+      - name: Trigger Render deploy (dashboard)
+        env: { HOOK: ${{ secrets.RENDER_DASH_DEPLOY_HOOK }} }
+        run: |
+          test -n "$HOOK" || { echo "Missing RENDER_DASH_DEPLOY_HOOK"; exit 1; }
+          curl -fsSL -X POST "$HOOK"
+>>>>>>> ef940a8 (heal)

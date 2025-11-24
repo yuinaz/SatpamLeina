@@ -1,0 +1,26 @@
+
+{% set title = "Settings" %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }}</title>
+  <link rel="stylesheet" href="/dashboard-theme/gtake/theme.css">
+  <link rel="stylesheet" href="/dashboard/dashboard-static/css/layout_compact.css">
+</head>
+<body class="gtake">
+  <header class="gtake-header">
+    <nav class="gtake-breadcrumb"><a href="/dashboard">Home</a><span>›</span><span>{{ title }}</span></nav>
+    <h1 class="page-title">{{ title }}</h1>
+  </header>
+  <main class="container" style="max-width:960px;margin:24px auto;padding:0 12px;">
+    <section class="card">
+      <div class="card-title">Tampilan</div>
+      <div class="card-body">
+        <p>Konfigurasi dasar dashboard. Tema aktif: <b>gtake</b>.</p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

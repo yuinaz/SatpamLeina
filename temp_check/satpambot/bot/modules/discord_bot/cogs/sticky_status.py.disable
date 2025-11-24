@@ -1,0 +1,215 @@
+
+from __future__ import annotations
+
+import asyncio
+import json
+import os
+from dataclasses import dataclass, asdict
+from datetime import datetime, timezone, timedelta
+from pathlib import Path
+from typing import Dict, Optional
+
+import discord
+from discord.ext import commands
+
+TZ_WIB = timezone(timedelta(hours=7), name="WIB")
+DATA_DIR = Path(os.getenv("DATA_DIR", "data")).resolve()
+STICKY_FILE = DATA_DIR / "sticky.json"
+
+# ------------- Model & Storage -------------
+@dataclass
+class StickyCfg:
+    enabled: bool = True
+    content: str = ""
+    last_msg_id: Optional[int] = None
+    min_interval_sec: int = 1800  # mencegah spam saat obrolan ramai
+    last_post_ts: float = 0.0
+
+def _load_all() -> Dict[str, StickyCfg]:
+    try:
+        if STICKY_FILE.exists():
+            raw = json.loads(STICKY_FILE.read_text(encoding="utf-8"))
+            out: Dict[str, StickyCfg] = {}
+            for k, v in raw.items():
+                out[k] = StickyCfg(**v)
+            return out
+    except Exception:
+        pass
+    return {}
+
+def _save_all(cfg: Dict[str, StickyCfg]) -> None:
+    try:
+        STICKY_FILE.parent.mkdir(parents=True, exist_ok=True)
+        STICKY_FILE.write_text(json.dumps({k: asdict(v) for k, v in cfg.items()}, indent=2, ensure_ascii=False), encoding="utf-8")
+    except Exception as e:
+        print(f"[sticky] save failed: {e}")
+
+# ------------- Cog -------------
+class StickyStatus(commands.Cog):
+    """Sticky message per-channel: bot memastikan pesan sticky selalu jadi pesan terbaru.
+    Commands (prefix):
+      - !sticky set <text>         : set konten sticky channel ini
+      - !sticky clear              : hapus sticky channel ini
+      - !sticky on|off             : aktif/nonaktifkan
+      - !sticky interval <detik>   : jeda minimal antar-posting ulang (default 30)
+      - !sticky show               : tampilkan ringkasan
+    Permissions: Manage Messages atau Administrator.
+    """
+
+    def __init__(self, bot: commands.Bot):
+        self.bot = bot
+        self._cfg = _load_all()
+
+    # ---------- Helpers ----------
+    def _key(self, channel: discord.abc.GuildChannel) -> str:
+        return f"{channel.guild.id}:{channel.id}"  # type: ignore[attr-defined]
+
+    def _get(self, channel) -> StickyCfg:
+        return self._cfg.get(self._key(channel), StickyCfg())
+
+    def _set(self, channel, cfg: StickyCfg):
+        self._cfg[self._key(channel)] = cfg
+        _save_all(self._cfg)
+
+    def _may_manage(self, ctx: commands.Context) -> bool:
+        perms = getattr(ctx.channel, "permissions_for", lambda u: None)(ctx.author)  # type: ignore
+        return bool(getattr(perms, "manage_messages", False) or getattr(perms, "administrator", False))
+
+    async def _ensure_sticky(self, channel: discord.TextChannel):
+        cfg = self._get(channel)
+        if not cfg.enabled or not cfg.content:
+            return
+
+        now_ts = datetime.now(TZ_WIB).timestamp()
+        if now_ts - (cfg.last_post_ts or 0) < max(5, int(cfg.min_interval_sec or 0)):
+            return  # rate limit
+
+        # cek pesan terakhir, kalau terakhir sudah sticky dari bot, biarkan
+        try:
+            last = [m async for m in channel.history(limit=1)][0]
+            if last.author.id == self.bot.user.id and cfg.content.strip() in (last.content or ""):
+                # sudah sticky di bawah
+                cfg.last_msg_id = last.id
+                cfg.last_post_ts = now_ts
+                self._set(channel, cfg)
+                return
+        except Exception:
+            pass
+
+        # hapus sticky lama kalau ada (agar tidak menumpuk)
+        if cfg.last_msg_id:
+            try:
+                old = await channel.fetch_message(cfg.last_msg_id)
+                # Hanya hapus jika benar pesan kita dan isinya sticky
+                if old.author.id == self.bot.user.id and cfg.content.strip() in (old.content or ""):
+                    await old.delete()
+            except Exception:
+                pass
+
+        # kirim ulang sticky di bawah
+        try:
+            msg = await channel.send(cfg.content)
+            cfg.last_msg_id = msg.id
+            cfg.last_post_ts = now_ts
+            self._set(channel, cfg)
+        except Exception as e:
+            print(f"[sticky] send failed in #{channel.id}: {e}")
+
+    # ---------- Events ----------
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message):
+        if message.author.bot or not isinstance(message.channel, discord.TextChannel):
+            return
+        # Kalau channel ini punya sticky, pastikan muncul di bawah setelah pesan user
+        key = self._key(message.channel)
+        if key in self._cfg and self._cfg[key].enabled and self._cfg[key].content:
+            await self._ensure_sticky(message.channel)
+
+    # ---------- Commands ----------
+    @commands.group(name="sticky", invoke_without_command=True)
+    async def sticky_group(self, ctx: commands.Context):
+        """Tampilkan bantuan sticky."""
+        cfg = self._get(ctx.channel)
+        desc = (
+            f"**Enabled**: {cfg.enabled}\n"
+            f"**Interval**: {cfg.min_interval_sec}s\n"
+            f"**Content**: {(cfg.content[:140] + '…') if len(cfg.content) > 140 else (cfg.content or '_(kosong)_')}"
+        )
+        await ctx.reply(
+            f"**Sticky (channel ini)**\n{desc}\n\n"
+            "**Perintah:**\n"
+            "`!sticky set <text>`\n`!sticky clear`\n`!sticky on|off`\n`!sticky interval <detik>`\n`!sticky show`",
+            mention_author=False
+        )
+
+    @sticky_group.command(name="set")
+    async def sticky_set(self, ctx: commands.Context, *, text: str):
+        if not self._may_manage(ctx):
+            return await ctx.reply("❌ Butuh permission **Manage Messages**.", mention_author=False)
+        cfg = self._get(ctx.channel)
+        cfg.content = text.strip()
+        cfg.enabled = True
+        self._set(ctx.channel, cfg)
+        await ctx.reply("✅ Sticky diset & diaktifkan.", mention_author=False)
+        await self._ensure_sticky(ctx.channel)  # tampilkan sekarang
+
+    @sticky_group.command(name="clear")
+    async def sticky_clear(self, ctx: commands.Context):
+        if not self._may_manage(ctx):
+            return await ctx.reply("❌ Butuh permission **Manage Messages**.", mention_author=False)
+        cfg = self._get(ctx.channel)
+        # hapus pesan terakhir bila ada
+        if cfg.last_msg_id:
+            try:
+                msg = await ctx.channel.fetch_message(cfg.last_msg_id)  # type: ignore
+                if msg.author.id == self.bot.user.id:
+                    await msg.delete()
+            except Exception:
+                pass
+        cfg.content = ""
+        cfg.last_msg_id = None
+        self._set(ctx.channel, cfg)
+        await ctx.reply("✅ Sticky dihapus dari channel ini.", mention_author=False)
+
+    @sticky_group.command(name="on")
+    async def sticky_on(self, ctx: commands.Context):
+        if not self._may_manage(ctx):
+            return await ctx.reply("❌ Butuh permission **Manage Messages**.", mention_author=False)
+        cfg = self._get(ctx.channel)
+        cfg.enabled = True
+        self._set(ctx.channel, cfg)
+        await ctx.reply("✅ Sticky **diaktifkan**.", mention_author=False)
+
+    @sticky_group.command(name="off")
+    async def sticky_off(self, ctx: commands.Context):
+        if not self._may_manage(ctx):
+            return await ctx.reply("❌ Butuh permission **Manage Messages**.", mention_author=False)
+        cfg = self._get(ctx.channel)
+        cfg.enabled = False
+        self._set(ctx.channel, cfg)
+        await ctx.reply("✅ Sticky **dinonaktifkan**.", mention_author=False)
+
+    @sticky_group.command(name="interval")
+    async def sticky_interval(self, ctx: commands.Context, seconds: int):
+        if not self._may_manage(ctx):
+            return await ctx.reply("❌ Butuh permission **Manage Messages**.", mention_author=False)
+        seconds = max(5, min(3600, int(seconds)))
+        cfg = self._get(ctx.channel)
+        cfg.min_interval_sec = seconds
+        self._set(ctx.channel, cfg)
+        await ctx.reply(f"✅ Interval sticky di-set ke **{seconds}s**.", mention_author=False)
+
+    @sticky_group.command(name="show")
+    async def sticky_show(self, ctx: commands.Context):
+        cfg = self._get(ctx.channel)
+        await ctx.reply(
+            f"**Sticky (channel ini)**\nEnabled: {cfg.enabled}\nInterval: {cfg.min_interval_sec}s\nContent:\n{cfg.content or '_(kosong)_'}",
+            mention_author=False
+        )
+
+# ----- loader kompatibel (discord.py 2.x mendukung async setup) -----
+async def setup(bot: commands.Bot):
+    await bot.add_cog(StickyStatus(bot))
+
+def setup(bot: commands.Bot):
+    bot.add_cog(StickyStatus(bot))

@@ -1,0 +1,16 @@
+
+/* compact layout overrides */
+:root{ --compact-gap:8px; --compact-pad:10px; --compact-radius:14px; --compact-font:13px; --compact-chip-h:44px; }
+html, body { overflow-x: hidden; }
+.container, .container-fluid { max-width: 1480px; }
+.row { margin-left: -6px; margin-right: -6px; }
+[class*="col-"] { padding-left: 6px; padding-right: 6px; min-width: 0; }
+.card { border-radius: var(--compact-radius); margin-bottom: var(--compact-gap); }
+.card .card-body { padding: var(--compact-pad); }
+.stat-strip { display:flex; flex-wrap:wrap; gap:var(--compact-gap); align-items:center; }
+.stat-chip { display:flex; align-items:center; justify-content:space-between; min-width:120px; height:var(--compact-chip-h);
+  padding:0 12px; border-radius:10px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); font-size:var(--compact-font); }
+.stat-chip .k{ opacity:.7; margin-right:8px; } .stat-chip .v{ font-weight:700; font-variant-numeric:tabular-nums; }
+.dropzone, .dz-default, .dnd-zone, .dragdrop-zone, [data-dropzone]{ min-height:120px !important; }
+.table { font-size: var(--compact-font); } .small, .muted, .text-muted { font-size:12px; opacity:.8; }
+.card, .table, .chart, .canvas, .widget { max-width:100%; overflow-x:auto; }

@@ -1,0 +1,86 @@
+{% extends 'base.html
+{% block title %}📊 Statistik SatpamBot{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="/dashboard" class="btn btn-outline-light">⬅️ Dashboard</a>
+    <h3>📈 Statistik Phishing & Aktivitas</h3>
+    <span class="text-muted">👤 {{ session.username or 'Admin' }}</span>
+  </div>
+
+  <div id="chart-container" class="bg-dark p-3 rounded shadow-sm mb-4">
+    <canvas id="statChart"></canvas>
+  </div>
+
+  <div id="member-container" class="bg-dark p-3 rounded shadow-sm">
+    <canvas id="memberChart"></canvas>
+  </div>
+
+  <div id="status-message" class="mt-3 text-warning fw-bold"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// === Statistik Phishing ===
+fetch("/api/server_stats")
+  .then(res => {
+    if (!res.ok) throw new Error("Gagal mengambil data dari server.");
+    return res.json();
+  })
+  .then(data => {
+    if (!data || data.length === 0) {
+      document.getElementById("status-message").textContent = "⚠️ Tidak ada data statistik ditemukan.";
+      return;
+    }
+
+    const ctx = document.getElementById("statChart").getContext("2d");
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: data.map(d => d.guild_name),
+        datasets: [{
+          label: "Jumlah Phishing Diblokir",
+          data: data.map(d => d.total_detected),
+          backgroundColor: "#4caf50"
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+  })
+  .catch(err => {
+    document.getElementById("status-message").textContent = "❌ Gagal memuat data statistik.";
+    console.error(err);
+  });
+
+// === Statistik Member Aktif ===
+fetch("/api/member_monitor")
+  .then(res => res.json())
+  .then(data => {
+    const ctx2 = document.getElementById("memberChart").getContext("2d");
+    new Chart(ctx2, {
+      type: "line",
+      data: {
+        labels: data.map(d => d.guild_name),
+        datasets: [{
+          label: "Jumlah Member Aktif",
+          data: data.map(d => d.member_count),
+          borderColor: "#2196f3",
+          tension: 0.3,
+          fill: false
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: true } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+  })
+  .catch(err => console.error("❌ Gagal memuat data member:", err));
+</script>
+{% endblock %}

@@ -1,0 +1,17 @@
+{
+  "servers": [
+    {
+      "name": "Local Web (127.0.0.1:8080)",
+      "type": "http",
+      "url": "http://127.0.0.1:8080/healthz",
+      "timeout": 2.0
+    },
+    {
+      "name": "Discord API",
+      "type": "tcp",
+      "host": "discord.com",
+      "port": 443,
+      "timeout": 2.0
+    }
+  ]
+}

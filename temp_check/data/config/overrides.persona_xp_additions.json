@@ -1,0 +1,17 @@
+{
+  "env_additions": {
+    "PERSONA_PROFILE": "teen_tsundere",
+    "QNA_INTERVAL_MIN": "15",
+    "XP_CHAIN_ENABLE": "1",
+    "XP_CHAIN_PERIOD_SEC": "120",
+    "XP_MAGANG_DONE_KEY": "leina:xp:magang:done",
+    "XP_PHASE_KEY": "leina:xp:phase",
+    "XP_NOTIFY_KEY": "leina:xp:last_notify_ms",
+    "OWNER_USER_ID": "",
+    "OWNER_NOTIFY_CHANNEL_ID": "",
+    "XP_WORK_L1_SALARY": "5000000",
+    "XP_WORK_L2_SALARY": "7000000",
+    "XP_WORK_L3_SALARY": "9000000",
+    "XP_WORK_LEVELS": "4"
+  }
+}

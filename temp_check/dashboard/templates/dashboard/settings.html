@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Settings • SatpamBot</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b111b;--panel:#111827;--muted:#9aa4b2;--line:#1f2937;--accent:#2563eb;--text:#e6edf3}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.wrap{max-width:920px;margin:24px auto;padding:0 16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+h1{font-size:20px;margin:0 0 10px} hr{border:0;border-top:1px solid var(--line);margin:10px 0 14px}
+label{display:block;margin:10px 0 6px;font-weight:600}
+input,select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:#0f172a;color:#e6edf3}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.actions{display:flex;gap:10px;margin-top:14px}
+.btn{background:var(--accent);color:#fff;border:0;border-radius:10px;padding:10px 14px;font-weight:600;text-decoration:none;cursor:pointer}
+.btn.secondary{background:#334155}
+.note{color:var(--muted);font-size:13px}
+.uprow{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+.checkbox{display:flex;gap:8px;align-items:center}
+</style>
+<link rel="stylesheet" href="/dashboard/dashboard-static/css/layout_compact.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>Settings</h1>
+    <hr>
+    <div class="checkbox">
+      <input type="checkbox" id="apply_to_login">
+      <label for="apply_to_login" style="margin:0">Terapkan theme & background ke halaman Login</label>
+    </div>
+    <div class="row">
+      <div>
+        <label for="logo_url">Logo URL</label>
+        <div class="uprow">
+          <input id="logo_url" placeholder="https://.../logo.png">
+          <label class="btn" style="padding:9px 12px;cursor:pointer">
+            Upload<input id="logo_file" type="file" accept="image/*" style="display:none">
+          </label>
+        </div>
+        <div class="note">Kosongkan untuk menyembunyikan logo.</div>
+      </div>
+      <div>
+        <label for="accent">Accent Color</label>
+        <input id="accent" value="#2563eb" placeholder="#2563eb">
+        <div class="note">Hex color (#rgb atau #rrggbb).</div>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label for="theme">Theme</label>
+        <select id="theme"></select>
+        <div class="note">Dark, Light, Nord, Dracula, Ocean, Forest, + custom dari <code>data/themes/*.json</code>.</div>
+      </div>
+      <div>
+        <label for="bg_mode">Background Mode</label>
+        <select id="bg_mode">
+          <option value="image">Image</option>
+          <option value="particles">Particles</option>
+          <option value="video">Video</option>
+        </select>
+      </div>
+    </div>
+    <div id="bg_image_box" class="row">
+      <div>
+        <label for="bg_url">Background URL</label>
+        <div class="uprow">
+          <input id="bg_url" placeholder="https://.../background.jpg">
+          <label class="btn" style="padding:9px 12px;cursor:pointer">
+            Upload<input id="bg_file" type="file" accept="image/*" style="display:none">
+          </label>
+        </div>
+      </div>
+      <div><div class="note">Mode Image menggunakan gambar statis.</div></div>
+    </div>
+    <div id="bg_particles_box" class="row" style="display:none">
+      <div>
+        <label for="particles_preset">Particles Preset</label>
+        <select id="particles_preset">
+          <option value="default">Default</option>
+          <option value="snow">Snow</option>
+          <option value="bubbles">Bubbles</option>
+          <option value="lines">Lines</option>
+        </select>
+      </div>
+      <div><div class="note">Pastikan script particles tersedia di login (pakai bridge JS).</div></div>
+    </div>
+    <div id="bg_video_box" class="row" style="display:none">
+      <div>
+        <label for="video_url">Video URL</label>
+        <div class="uprow">
+          <input id="video_url" placeholder="https://.../video.mp4">
+          <label class="btn" style="padding:9px 12px;cursor:pointer">
+            Upload<input id="video_file" type="file" accept="video/mp4,video/webm,video/ogg" style="display:none">
+          </label>
+        </div>
+      </div>
+      <div><div class="note">Video akan diputar tanpa suara & loop sebagai background.</div></div>
+    </div>
+    <div class="actions">
+      <button class="btn" id="save">Simpan</button>
+      <a class="btn secondary" href="/dashboard">Kembali</a>
+    </div>
+    <div id="msg" class="note" style="margin-top:10px"></div>
+  </div>
+</div>
+<script>
+async function get(u){const r=await fetch(u);return await r.json();}
+async function postJSON(u,data){const r=await fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});return await r.json();}
+async function upload(kind, file){
+  const fd = new FormData(); fd.append('file', file);
+  const r = await fetch('/api/ui-upload?kind='+kind,{method:'POST',body:fd});
+  return await r.json();
+}
+function setVal(id,val){ const el=document.getElementById(id); if(el) el.value = val ?? ''; }
+function getVal(id){ const el=document.getElementById(id); return el? el.value.trim():''; }
+function setChecked(id,val){ const el=document.getElementById(id); if(el) el.checked = !!val; }
+function getChecked(id){ const el=document.getElementById(id); return el? !!el.checked : false; }
+function showBox(mode){
+  document.getElementById('bg_image_box').style.display = (mode==='image')?'grid':'none';
+  document.getElementById('bg_particles_box').style.display = (mode==='particles')?'grid':'none';
+  document.getElementById('bg_video_box').style.display = (mode==='video')?'grid':'none';
+}
+(async()=>{
+  const themes = await get('/api/ui-themes'); const sel = document.getElementById('theme');
+  (themes.themes||[]).forEach(name=>{ const o=document.createElement('option'); o.value=name; o.textContent=name[0].toUpperCase()+name.slice(1); sel.appendChild(o); });
+  const ui = await get('/api/ui-settings');
+  if(ui){ setChecked('apply_to_login', ui.apply_to_login); setVal('logo_url',ui.logo_url); setVal('bg_url',ui.bg_url); setVal('accent',ui.accent);
+          setVal('theme',ui.theme); setVal('bg_mode', ui.bg_mode||'image'); setVal('video_url', ui.video_url||''); setVal('particles_preset', ui.particles_preset||'default'); showBox(ui.bg_mode||'image'); }
+  document.getElementById('bg_mode').onchange = e => showBox(e.target.value);
+  document.getElementById('logo_file').onchange = async (e)=>{ const f=e.target.files[0]; if(!f) return; const res=await upload('logo', f); if(res.ok){ setVal('logo_url',res.url); document.getElementById('msg').textContent='✅ Logo terupload.'; } else { document.getElementById('msg').textContent='❌ Gagal upload logo.'; } };
+  document.getElementById('bg_file').onchange = async (e)=>{ const f=e.target.files[0]; if(!f) return; const res=await upload('bg', f); if(res.ok){ setVal('bg_url',res.url); document.getElementById('msg').textContent='✅ Background terupload.'; } else { document.getElementById('msg').textContent='❌ Gagal upload background.'; } };
+  document.getElementById('video_file').onchange = async (e)=>{ const f=e.target.files[0]; if(!f) return; const res=await upload('video', f); if(res.ok){ setVal('video_url',res.url); document.getElementById('msg').textContent='✅ Video terupload.'; } else { document.getElementById('msg').textContent='❌ Gagal upload video.'; } };
+  document.getElementById('save').onclick=async()=>{
+    const data={apply_to_login:getChecked('apply_to_login'), logo_url:getVal('logo_url'), bg_url:getVal('bg_url'), accent:getVal('accent'),
+                theme:getVal('theme'), bg_mode:getVal('bg_mode'), video_url:getVal('video_url'), particles_preset:document.getElementById('particles_preset').value};
+    const res = await postJSON('/api/ui-settings', data);
+    document.getElementById('msg').textContent = res && res.ok? '✅ Tersimpan.' : '❌ Gagal menyimpan.';
+  };
+})();</script>
+<script src="/dashboard/dashboard-static/js/compact_layout.js"></script>
+<script src="/dashboard/dashboard-static/js/remove_option_button.js"></script>
+</body></html>

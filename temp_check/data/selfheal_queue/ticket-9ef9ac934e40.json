@@ -1,0 +1,12 @@
+{
+  "id": "9ef9ac934e40",
+  "created_at": 1760503514.2985532,
+  "status": "diagnosed",
+  "level": "WARNING",
+  "message": "add_cog failed for LearningPassiveObserver: ClientException(\"Cog named 'LearningPassiveObserver' already loaded\")",
+  "where": "a00_fix_failed_cogs_overlay:_safe_add",
+  "time": 1760503514.2985532,
+  "diagnosis": {
+    "note": "Groq disabled or not configured."
+  }
+}

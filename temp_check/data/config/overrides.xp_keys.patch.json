@@ -1,0 +1,6 @@
+{
+  "env": {
+    "XP_TOTAL_KEY": "xp:bot:senior_total",
+    "XP_SENIOR_KEY": "xp:bot:senior_total"
+  }
+}

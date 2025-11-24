@@ -1,0 +1,61 @@
+<<<<<<< HEAD
+<<<<<<< HEAD
+secrets/
+local*.json
+*.env
+*.env.*
+SatpamBot.env
+=======
+
+=======
+>>>>>>> 377f4f2 (secure: remove local secrets; add safe example + improved pre-commit)
+# Local env & overrides
+.env
+.env.*
+*.env
+SatpamBot.env
+satpambot_config.local.json
+config/*.local.json
+satpambot/config/99_env_override.json
+
+# Secrets folders
+secrets/
+secrets_backup/
+
+# Bot state (persist locally)
+data/state/
+data/phash/*.json
+
+# Python/OS/Build noise
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+dist/
+build/
+out/
+*.log
+run_local.log
+build_exe.log
+exe_run.log
+<<<<<<< HEAD
+>>>>>>> ef940a8 (heal)
+=======
+*.msi
+*.pkg
+*.spec
+.DS_Store
+Thumbs.db
+
+# Archives
+*.zip
+*.rar
+
+satpambot_config.local.json
+
+satpambot_config.local.json
+
+satpambot_config.local.json
+satpambot_config.local.backup.json
+*.backup.json
+>>>>>>> 377f4f2 (secure: remove local secrets; add safe example + improved pre-commit)

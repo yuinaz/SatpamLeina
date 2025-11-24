@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard • SatpamBot</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b111b;--panel:#111827;--muted:#9aa4b2;--line:#1f2937;--accent:#2563eb;--text:#e6edf3;
+}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.wrap{max-width:1100px;margin:24px auto;padding:0 16px}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.brand{display:flex;gap:10px;align-items:center}
+.brand img{height:28px;width:28px;border-radius:8px;display:none}
+h1{font-size:20px;margin:0}
+hr{border:0;border-top:1px solid var(--line);margin:10px 0 14px}
+.grid{display:grid;grid-template-columns:2fr 2fr;gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+.card h2{font-size:16px;margin:0 0 8px}
+.small{color:var(--muted);font-size:13px}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{padding:8px;border-top:1px solid var(--line);text-align:left;font-size:14px}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;background:#0f172a;border:1px solid var(--line);font-size:12px;color:#cbd5e1}
+.kpi{display:flex;justify-content:space-between;align-items:center}
+.kpi strong{font-size:14px} .kpi .val{font-weight:600}
+.center{display:flex;align-items:center;justify-content:center;height:120px;color:#64748b}
+.btn{background:var(--accent);color:#fff;border:0;border-radius:10px;padding:8px 12px;font-weight:600;text-decoration:none}
+.btn:hover{opacity:.9}
+</style>
+<link rel="stylesheet" href="/dashboard/dashboard-static/css/layout_compact.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="brand">
+      <img id="logo" alt="logo">
+      <h1>Dashboard</h1>
+    </div>
+    <a class="btn" href="/dashboard/settings">Settings</a>
+  </div>
+  <hr>
+  <div class="card">
+    <div class="kpi">
+      <div><strong>Mini Monitor</strong> <span class="small">Uptime: <span id="uptime">--</span></span></div>
+      <div class="small">CPU: <span id="cpu">--</span>% &nbsp;&nbsp; RAM: <span id="ram">--</span> MB</div>
+    </div>
+  </div>
+  <div class="grid" style="margin-top:12px">
+    <div class="card">
+      <h2>Status Servers</h2>
+      <table class="table"><thead><tr><th>Nama</th><th>Status</th><th>Ping</th></tr></thead><tbody id="servers">
+        <tr><td colspan="3" class="small">Tidak ada data.</td></tr>
+      </tbody></table>
+    </div>
+    <div class="card">
+      <h2>Activity</h2>
+      <div id="activity" class="center small">Gagal memuat data.</div>
+    </div>
+  </div>
+</div>
+<script>
+async function getJSON(u){try{const r=await fetch(u,{cache:"no-store"});if(!r.ok)throw 0;return await r.json()}catch(e){return null}}
+function fmtUptime(s){if(s==null)return"--";const d=Math.floor(s/86400);s%=86400;const h=Math.floor(s/3600);s%=3600;const m=Math.floor(s/60);const sec=s%60;let out=[];if(d)out.push(d+"d");if(h)out.push(h+"h");if(m)out.push(m+"m");out.push(sec+"s");return out.join(" ")}
+function applyTheme(colors){const r=document.documentElement.style; r.setProperty('--bg',colors.bg); r.setProperty('--text',colors.text); r.setProperty('--panel',colors.panel); r.setProperty('--line',colors.line); r.setProperty('--muted',colors.muted);}
+function applyUI(ui){
+  if(!ui) return;
+  const root=document.documentElement.style;
+  if(ui.accent){ root.setProperty("--accent", ui.accent); }
+  if(ui.bg_url){
+    document.body.style.backgroundImage = "linear-gradient(rgba(0,0,0,.25), rgba(0,0,0,.25)), url('"+ui.bg_url+"')";
+    document.body.style.backgroundSize = "cover"; document.body.style.backgroundPosition="center";
+  }else{
+    document.body.style.backgroundImage = "none";
+  }
+  const logo = document.getElementById("logo");
+  if(ui.logo_url){ logo.src = ui.logo_url; logo.style.display="block"; } else { logo.style.display="none"; }
+}
+async function refresh(){
+  const themes = await getJSON("/api/ui-themes"); const ui = await getJSON("/api/ui-settings");
+  if(themes && ui){ const name = ui.theme || "dark"; const idx = themes.themes.indexOf(name); const pick = name; 
+    // fetch theme colors from server map via a tiny trick: embed in window on settings page only; here we fallback client-side defaults
+    const map = {"dark":{"bg":"#0b111b","text":"#e6edf3","panel":"#111827","line":"#1f2937","muted":"#9aa4b2"},"light":{"bg":"#f3f4f6","text":"#111827","panel":"#ffffff","line":"#e5e7eb","muted":"#6b7280"},"nord":{"bg":"#2e3440","text":"#eceff4","panel":"#3b4252","line":"#434c5e","muted":"#d8dee9"},"dracula":{"bg":"#282a36","text":"#f8f8f2","panel":"#1e1f29","line":"#44475a","muted":"#bd93f9"},"ocean":{"bg":"#0f172a","text":"#e2e8f0","panel":"#111827","line":"#1f2937","muted":"#94a3b8"},"forest":{"bg":"#0b1310","text":"#e2f7e1","panel":"#0f1d18","line":"#1b2a24","muted":"#9fd4b5"}};
+    applyTheme(map[pick] || map.dark);
+  }
+  applyUI(ui);
+  const mon=await getJSON("/api/monitor"); if(mon){document.getElementById("uptime").textContent=fmtUptime(mon.uptime_s||0);document.getElementById("cpu").textContent=mon.cpu_percent==null?"--":mon.cpu_percent;document.getElementById("ram").textContent=mon.mem_mb==null?"--":mon.mem_mb;}
+  const act=await getJSON("/api/activity"); const box=document.getElementById("activity"); if(act && act.lines && act.lines.length){box.classList.remove("center"); box.innerHTML = "<pre class='small' style='white-space:pre-wrap'>"+act.lines.map(x=>x.replace(/[<>&]/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))).join("\\n")+"</pre>";}
+  const s=await getJSON("/api/servers"); const tb=document.getElementById("servers"); if(s && s.servers && s.servers.length){tb.innerHTML=s.servers.map(row=>`<tr><td>${row.name||"-"}</td><td><span class="badge" style="border-color:${row.status==='UP'?'#22c55e':'#ef4444'};color:${row.status==='UP'?'#86efac':'#fecaca'}">${row.status||"-"}</span></td><td>${row.ping||"-"}</td></tr>`).join("")}
+}
+refresh(); setInterval(refresh, 8000);
+</script>
+<script src="/dashboard/dashboard-static/js/compact_layout.js"></script>
+<script src="/dashboard/dashboard-static/js/remove_option_button.js"></script>
+</body></html>

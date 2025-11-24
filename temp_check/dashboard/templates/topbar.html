@@ -1,0 +1,15 @@
+{% block content %}
+{% extends 'base.html
+<div class="topbar">
+    <div>
+        <button id="toggleSidebar" class="btn btn-sm btn-light me-2">☰</button>
+        <strong>Dashboard SatpamBot</strong>
+    </div>
+    <div>
+        👤 {{ username or 'Guest' }}
+        <button id="toggleTheme" class="btn btn-sm btn-secondary ms-3">🌓</button>
+    </div>
+</div>
+
+
+{% endblock %}

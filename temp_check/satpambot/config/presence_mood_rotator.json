@@ -1,0 +1,40 @@
+{
+  "interval_minutes": 120,
+  "default_status": "online",
+  "moods": {
+    "calm": [
+      { "type": "watching",  "name": "朝の光…今日もやるか。" },
+      { "type": "listening", "name": "鳥の声？…べつに気にしてないけど。" },
+      { "type": "playing",   "name": "ホットコーヒーで目覚まし。" },
+      { "type": "watching",  "name": "おはよう。ちゃんと起きなさいよ。" },
+      { "type": "listening", "name": "静かな朝って…悪くない。" },
+      { "type": "playing",   "name": "準備しなさい、ほら。" }
+    ],
+    "helpful": [
+      { "type": "playing",   "name": "Butuh bantuan? /help aja—べ、別に優しくないけど。" },
+      { "type": "listening", "name": "kalau bingung, panggil aja… cepat." },
+      { "type": "watching",  "name": "Pengumuman? sini aku cek dulu." },
+      { "type": "playing",   "name": "Ayo rapihin chat, biar rapi dikit lah." },
+      { "type": "listening", "name": "mod lagi stand by, santai." },
+      { "type": "competing", "name": "Lawan bug dulu bentar, sabar ya." }
+    ],
+    "alert": [
+      { "type": "watching",  "name": "リンクは確認してから開きなさい！" },
+      { "type": "competing", "name": "Phishing? sini lawan sekarang." },
+      { "type": "watching",  "name": "Ada yang aneh… jangan macam-macam ya." },
+      { "type": "playing",   "name": "検証中…証拠は逃がさない。" },
+      { "type": "listening", "name": "alarm bunyi—aku urus." },
+      { "type": "competing", "name": "連番画像？チェック完了。" }
+    ],
+    "sleeping": [
+      { "type": "watching",  "name": "もう寝る時間よ…Zzz" },
+      { "type": "listening", "name": "雨音で眠くなる…" },
+      { "type": "playing",   "name": "枕とケンカ中…負けない…" },
+      { "type": "watching",  "name": "深夜巡回中…でも眠い…" },
+      { "type": "listening", "name": "ナイトモード、静かにね。" },
+      { "type": "playing",   "name": "夢の中でも警備中…たぶんね。" }
+    ]
+  },
+  "weights": { "tod": 0.5, "ftab": 0.5 },
+  "avoid_repeat": true
+}

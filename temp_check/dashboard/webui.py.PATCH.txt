@@ -1,0 +1,280 @@
+
+# --- PATCH: add endpoints for phash upload, live bans, and metrics ingest ---
+# Place this block inside satpambot/dashboard/webui.py (after blueprint is created).
+# If the functions/names already exist, you can replace them.
+import os, io, time, json, re, sqlite3, hashlib
+from datetime import datetime
+from flask import request, jsonify, current_app
+try:
+    from PIL import Image
+    import imagehash
+except Exception:
+    Image = None
+    imagehash = None
+import requests
+
+def _data_dir():
+    # Allow override via env, fallback to project ./data
+    d = os.getenv("DATA_DIR")
+    if d:
+        return d
+    # Guess project root from this file
+    here = os.path.dirname(os.path.abspath(__file__))
+    # satpambot/dashboard/webui.py -> project_root/..
+    return os.path.abspath(os.path.join(here, "..", "..", "..", "data"))
+
+def _ensure_dir(p):
+    os.makedirs(p, exist_ok=True)
+    return p
+
+def _now():
+    return int(time.time())
+
+def _ts_human(ts=None):
+    ts = ts or _now()
+    try:
+        return datetime.fromtimestamp(int(ts)).strftime("%Y-%m-%d %H:%M:%S")
+    except Exception:
+        return str(ts)
+
+def _compute_phash(pil_img):
+    # Prefer imagehash if available
+    if imagehash is not None and pil_img is not None:
+        return str(imagehash.phash(pil_img))
+    # Fallback: average hash (manual & simple)
+    if pil_img is None:
+        return None
+    try:
+        im = pil_img.convert("L").resize((8,8))
+        pixels = list(im.getdata())
+        avg = sum(pixels) / len(pixels)
+        bits = ''.join('1' if p > avg else '0' for p in pixels)
+        return hex(int(bits, 2))[2:].rjust(16, '0')
+    except Exception:
+        return None
+
+def _save_phash_to_blocklist(phash_value):
+    dd = _ensure_dir(os.path.join(_data_dir(), "phish_lab"))
+    f = os.path.join(dd, "phash_blocklist.json")
+    data = []
+    if os.path.exists(f):
+        try:
+            data = json.load(open(f, "r", encoding="utf-8"))
+        except Exception:
+            data = []
+    if phash_value and phash_value not in data:
+        data.append(phash_value)
+        json.dump(data, open(f, "w", encoding="utf-8"), indent=2)
+    return f, len(data)
+
+@dashboard_bp.route("/api/phash/upload", methods=["POST"])
+def api_phash_upload():
+    """
+    Accept image file upload OR JSON {url: "..."}.
+    - Stores to data/uploads/phish-lab
+    - Computes pHash and appends to data/phish_lab/phash_blocklist.json
+    Returns {ok:true, phash:"...", saved:"relative_path"}
+    """
+    try:
+        dd = _ensure_dir(os.path.join(_data_dir(), "uploads", "phish-lab"))
+        file_storage = request.files.get("file")
+        url_json = None
+        if request.is_json:
+            url_json = (request.json or {}).get("url")
+        if not file_storage and not url_json:
+            return jsonify(ok=False, error="No file or url provided"), 400
+
+        # Load image bytes
+        if file_storage:
+            raw = file_storage.read()
+            fname = re.sub(r"[^A-Za-z0-9._-]+", "_", file_storage.filename or f"upload_{_now()}.png")
+            dest = os.path.join(dd, f"{_now()}_{fname}")
+        else:
+            # Download from URL
+            try:
+                r = requests.get(url_json, timeout=10)
+                r.raise_for_status()
+            except Exception as e:
+                return jsonify(ok=False, error=f"Failed to fetch url: {e}"), 400
+            raw = r.content
+            ext = "png"
+            m = re.search(r"\.([a-zA-Z0-9]{3,5})(?:$|\?)", url_json or "")
+            if m: ext = m.group(1).lower()
+            dest = os.path.join(dd, f"{_now()}_fromurl.{ext}")
+
+        # Open via PIL & compute phash
+        pil_img = None
+        try:
+            from PIL import Image as _PILImage
+            pil_img = _PILImage.open(io.BytesIO(raw)).convert("RGBA")
+        except Exception as e:
+            return jsonify(ok=False, error=f"Invalid image: {e}"), 400
+
+        phash_value = _compute_phash(pil_img)
+
+        # Save image
+        try:
+            pil_img.save(dest)
+        except Exception:
+            # Fallback raw write
+            with open(dest, "wb") as f:
+                f.write(raw)
+
+        # Append to blocklist
+        blocklist_path, total = _save_phash_to_blocklist(phash_value)
+
+        return jsonify(ok=True, phash=phash_value, saved_to=os.path.relpath(dest, start=os.path.dirname(_data_dir())),
+                       blocklist= os.path.relpath(blocklist_path, start=os.path.dirname(_data_dir())),
+                       blocklist_total= total)
+    except Exception as e:
+        current_app.logger.exception("phash upload failed")
+        return jsonify(ok=False, error=str(e)), 500
+
+def _read_live_metrics():
+    f = os.path.join(_data_dir(), "live_metrics.json")
+    data = {}
+    if os.path.exists(f):
+        try:
+            data = json.load(open(f, "r", encoding="utf-8"))
+        except Exception:
+            data = {}
+    # Add basic host metrics as fallback
+    try:
+        import psutil
+        data.setdefault("cpu_percent", psutil.cpu_percent(interval=0.0))
+        data.setdefault("ram_mb", round(psutil.virtual_memory().used/1024/1024))
+    except Exception:
+        pass
+    return data
+
+@dashboard_bp.route("/api/metrics-ingest", methods=["POST"])
+def api_metrics_ingest():
+    """
+    Bot can POST JSON here (optionally with header 'X-Token' == METRICS_INGEST_TOKEN)
+    and this will be surfaced at GET /api/metrics.
+    """
+    tok_need = os.getenv("METRICS_INGEST_TOKEN", "")
+    tok_got = request.headers.get("X-Token", "")
+    if tok_need and tok_need != tok_got:
+        return jsonify(ok=False, error="unauthorized"), 401
+    try:
+        data = request.get_json(force=True, silent=True) or {}
+        f = os.path.join(_data_dir(), "live_metrics.json")
+        _ensure_dir(os.path.dirname(f))
+        data["ts"] = _now()
+        json.dump(data, open(f, "w", encoding="utf-8"), indent=2)
+        return jsonify(ok=True)
+    except Exception as e:
+        current_app.logger.exception("metrics ingest failed")
+        return jsonify(ok=False, error=str(e)), 500
+
+@dashboard_bp.route("/api/metrics", methods=["GET"])
+def api_metrics():
+    # If existing route already exists, you can keep either; they should be equivalent.
+    data = _read_live_metrics()
+    # Normalize keys
+    resp = {
+        "guilds": data.get("guilds") or data.get("guild_count") or data.get("guilds_count") or 0,
+        "members": data.get("members") or data.get("member_count") or 0,
+        "online": data.get("online") or data.get("online_count") or 0,
+        "channels": data.get("channels") or 0,
+        "threads": data.get("threads") or 0,
+        "latency_ms": data.get("latency_ms") or data.get("ping_ms") or data.get("latency") or 0,
+        "cpu_percent": data.get("cpu_percent"),
+        "ram_mb": data.get("ram_mb"),
+        "ts": data.get("ts"),
+    }
+    return jsonify(resp)
+
+def _sqlite_bans_rows(limit=50):
+    # Try multiple table/column names defensively.
+    db = os.path.join(_data_dir(), "bans.sqlite")
+    if not os.path.exists(db): return []
+    conn = sqlite3.connect(db)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    # discover a plausible table
+    tables = [r[0] for r in cur.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
+    cand_tables = [t for t in tables if re.search(r"ban", t, re.I)] or tables
+    rows = []
+    for t in cand_tables:
+        # discover columns
+        cols = [r[1] for r in cur.execute(f"PRAGMA table_info({t})").fetchall()]
+        # Try a few common column sets
+        col_user = next((c for c in cols if c.lower() in ("user_id","userid","target_id","member_id")), None)
+        col_name = next((c for c in cols if c.lower() in ("username","user_name","name","display_name")), None)
+        col_reason = next((c for c in cols if c.lower() in ("reason","ban_reason")), None)
+        col_ts = next((c for c in cols if c.lower() in ("created_at","ts","timestamp","time")), None)
+        col_mod = next((c for c in cols if c.lower() in ("moderator","mod","actor","staff")), None)
+        if not col_user and not col_name:
+            continue
+        order_col = col_ts or "rowid"
+        q = f"SELECT {', '.join([c for c in [col_user, col_name, col_reason, col_ts, col_mod] if c])} FROM {t} ORDER BY {order_col} DESC LIMIT ?"
+        try:
+            for r in cur.execute(q, (limit,)):
+                d = dict(r)
+                rows.append({
+                    "user_id": d.get(col_user) if col_user else None,
+                    "username": d.get(col_name) if col_name else None,
+                    "reason": d.get(col_reason) if col_reason else None,
+                    "time": d.get(col_ts) if col_ts else None,
+                    "time_human": _ts_human(d.get(col_ts)) if col_ts else None,
+                    "mod": d.get(col_mod) if col_mod else None,
+                })
+            if rows: break
+        except Exception:
+            continue
+    conn.close()
+    return rows
+
+def _jsonl_bans_rows(limit=50):
+    # data/ban_events.jsonl (one json per line) or data/banlog.jsonl
+    for name in ("ban_events.jsonl", "banlog.jsonl", "ban_events.json"):
+        f = os.path.join(_data_dir(), name)
+        if not os.path.exists(f): continue
+        rows = []
+        try:
+            if f.endswith(".jsonl"):
+                with open(f, "r", encoding="utf-8") as fh:
+                    for line in fh.readlines()[::-1]:
+                        if not line.strip(): continue
+                        try:
+                            j = json.loads(line)
+                        except Exception:
+                            continue
+                        rows.append({
+                            "user_id": j.get("user_id") or j.get("uid"),
+                            "username": j.get("username") or j.get("name"),
+                            "reason": j.get("reason"),
+                            "time": j.get("ts") or j.get("time"),
+                            "time_human": _ts_human(j.get("ts") or j.get("time")),
+                            "mod": j.get("moderator") or j.get("mod"),
+                        })
+                        if len(rows) >= limit: break
+            else:
+                arr = json.load(open(f, "r", encoding="utf-8"))
+                for j in arr[::-1]:
+                    rows.append({
+                        "user_id": j.get("user_id") or j.get("uid"),
+                        "username": j.get("username") or j.get("name"),
+                        "reason": j.get("reason"),
+                        "time": j.get("ts") or j.get("time"),
+                        "time_human": _ts_human(j.get("ts") or j.get("time")),
+                        "mod": j.get("moderator") or j.get("mod"),
+                    })
+                    if len(rows) >= limit: break
+        except Exception:
+            continue
+        if rows: return rows
+    return []
+
+@dashboard_bp.route("/api/banned_users", methods=["GET"])
+def api_banned_users():
+    limit = max(1, min(200, int(request.args.get("limit", 50))))
+    rows = _sqlite_bans_rows(limit=limit)
+    src = "sqlite" if rows else None
+    if not rows:
+        rows = _jsonl_bans_rows(limit=limit)
+        if rows: src = "jsonl"
+    return jsonify({ "ok": True, "rows": rows, "source": src or "none" })

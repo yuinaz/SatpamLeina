@@ -1,0 +1,12 @@
+{
+  "id": "1a2661d8e8d3",
+  "created_at": 1760503514.2073402,
+  "status": "diagnosed",
+  "level": "WARNING",
+  "message": "[autoload_selfheal_autofix] Extension 'satpambot.bot.modules.discord_bot.cogs.a06_selfheal_json_guard_overlay' is already loaded.",
+  "where": "satpambot.bot.modules.discord_bot.cogs.a00_autoload_selfheal_autofix:cog_load",
+  "time": 1760503514.2033522,
+  "diagnosis": {
+    "note": "Groq disabled or not configured."
+  }
+}

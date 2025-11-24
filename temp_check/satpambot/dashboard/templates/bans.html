@@ -1,0 +1,42 @@
+{% extends 'base.html
+{% block title %}Banned Users - SatpamBot{% endblock %}
+{% block content %}
+<div class="card" style="padding:16px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+    <h4>Daftar Banned Users</h4>
+    <a href="/dashboard" class="btn btn-sm btn-secondary">⬅ Kembali</a>
+  </div>
+  <div class="mb-2"><button id="btn-refresh" class="button">🔄 Muat Ulang</button></div>
+  <table class="table" id="tblBans">
+    <thead><tr><th>ID</th><th>User</th><th>Guild</th><th>Alasan</th><th>Diban</th><th>Aktif</th><th>Aksi</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+<script>
+async function fetchBans(){
+  const r = await fetch('/api/bans'); const rows = await r.json();
+  const tb = document.querySelector('#tblBans tbody'); tb.innerHTML='';
+  rows.sort((a,b)=> (b.active?1:0) - (a.active?1:0) );
+  for(const r of rows){
+    const tr = document.createElement('tr');
+    const active = !!r.active;
+    tr.innerHTML = `<td>${r.id??''}</td>
+      <td><strong>${r.username||r.user_id}</strong><br><small>${r.user_id||''}</small></td>
+      <td>${r.guild_id||'-'}</td>
+      <td>${r.reason||'-'}</td>
+      <td><small>${(r.banned_at||'').replace('T',' ').replace('Z','')}</small></td>
+      <td><div class="form-check form-switch"><input class="form-check-input" type="checkbox" ${active?'checked':''} disabled></div></td>
+      <td><button class="btn btn-sm btn-success" ${active?'':'disabled'} onclick="unban('${r.user_id}')">Unban</button></td>`;
+    tb.appendChild(tr);
+  }
+}
+async function unban(userId){
+  if(!confirm('Unban user ini?')) return;
+  const r = await fetch(`/api/unban/${userId}`, {method:'POST'});
+  const j = await r.json();
+  if(j.status==='success'){ fetchBans(); } else { alert('Gagal: ' + (j.message||j.status)); }
+}
+document.getElementById('btn-refresh').onclick = fetchBans;
+fetchBans();
+</script>
+{% endblock %}

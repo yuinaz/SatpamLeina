@@ -1,0 +1,55 @@
+{% extends 'base.html
+{% block title %}🛡️ Blacklist Gambar{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="/dashboard" class="btn btn-outline-light">⬅️ Dashboard</a>
+    <h3>🛡️ Blacklist Gambar</h3>
+    <span class="text-muted">👤 {{ session.username }}</span>
+  </div>
+  <div class="card bg-dark text-light mb-4">
+    <div class="card-header">Tambah Gambar ke Blacklist</div>
+    <div class="card-body">
+      <form action="/blacklist-image" method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+          <label class="form-label">Pilih Gambar:</label>
+          <input type="file" class="form-control" name="image" accept="image/*" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Catatan (opsional):</label>
+          <input type="text" class="form-control" name="note" placeholder="MrBeast $2500 scam v1">
+        </div>
+        <button type="submit" class="btn btn-primary">➕ Tambahkan</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card bg-dark text-light">
+    <div class="card-header">Data Hash Tersimpan</div>
+    <div class="card-body">
+      <p class="text-muted">Total: {{ items|length }} hash set</p>
+      <div class="table-responsive">
+        <table class="table table-dark table-sm align-middle">
+          <thead><tr><th>#</th><th>pHash</th><th>dHash</th><th>aHash</th><th>Regions (9)</th><th>Note</th><th>Added By</th><th>At</th></tr></thead>
+          <tbody>
+            {% for it in items %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td>{{ it.phash if it.phash is defined else it['phash'] }}</td>
+              <td>{{ it.dhash if it.dhash is defined else it['dhash'] }}</td>
+              <td>{{ it.ahash if it.ahash is defined else it['ahash'] }}</td>
+              <td style="max-width:380px;white-space:nowrap;overflow:auto">{{ it.regions|join(', ') }}</td>
+              <td>{{ it.note }}</td>
+              <td>{{ it.added_by }}</td>
+              <td>{{ it.added_at }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+<script src="/dashboard-static/js/phash_poller.js?v={{ cache_bust }}"></script>

@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Settings — gtake</title>
+  <link rel="stylesheet" href="/dashboard-theme/gtake/theme.css">
+  <style>
+    :root { --ok: #10b981; --warn:#f59e0b; --err:#ef4444; }
+    body { margin: 0; padding: 24px; }
+    .card { background: rgba(255,255,255,.04); border-radius: 16px; padding: 18px 20px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    label { font-size: 13px; opacity: .9; display:block; margin-bottom: 6px; }
+    input[type="text"], input[type="url"] { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,.15); background: rgba(0,0,0,.25); color: #e5e7eb; }
+    input[type="file"] { display:block; }
+    .preview { height: 56px; border-radius: 10px; background-size: cover; background-position: center; border: 1px dashed rgba(255,255,255,.18); }
+    .actions { margin-top: 16px; display:flex; gap:10px; }
+    button { padding: 10px 14px; border-radius: 10px; border: 0; cursor: pointer; }
+    .primary { background: var(--ok); color: #042; }
+    .ghost { background: rgba(255,255,255,.08); color: #e5e7eb; }
+    .muted { font-size: 12px; opacity:.8 }
+    .log { margin-top: 10px; }
+    .log .ok   { background: rgba(16,185,129,.12); color: var(--ok); }
+    .log .err  { background: rgba(239,68,68,.12); color: var(--err); }
+    .alert { background: rgba(59,130,246,.12); color:#93c5fd; padding: 8px 12px; border-radius: 12px; display:inline-block; }
+    .h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+    .h2 { font-size: 18px; font-weight: 600; margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <a href="/dashboard" class="muted">Home</a> <span class="muted">›</span> <span class="muted">Settings</span>
+  <div class="h1">Settings</div>
+  <p class="alert">Konfigurasi dasar dashboard. Tema aktif: <b>gtake</b>.</p>
+
+  <div class="card" style="margin-top:16px">
+    <div class="h2">Tampilan</div>
+    <div class="row">
+      <div>
+        <label>Logo URL</label>
+        <input id="logoUrl" type="url" placeholder="https://…/logo.png">
+        <div id="logoPrev" class="preview" style="margin-top:8px"></div>
+        <div style="height:6px"></div>
+        <label>Upload logo (opsional)</label>
+        <input id="logoFile" type="file" accept="image/*">
+      </div>
+      <div>
+        <label>Background URL</label>
+        <input id="bgUrl" type="url" placeholder="https://…/background.jpg">
+        <div id="bgPrev" class="preview" style="margin-top:8px"></div>
+        <div style="height:6px"></div>
+        <label>Upload background (opsional)</label>
+        <input id="bgFile" type="file" accept="image/*">
+      </div>
+    </div>
+    <div class="actions">
+      <button id="btnSave" class="primary">Simpan</button>
+      <button id="btnReset" class="ghost">Reset</button>
+    </div>
+    <div id="log" class="log"></div>
+    <p class="muted">Penyimpanan: nilai disimpan via <code>/api/ui-config</code>. Upload file menggunakan <code>/dashboard/upload</code>. Jika upload tidak mengembalikan URL, nilai masih bisa dipasang manual dari link publik.</p>
+  </div>
+
+<script>
+(function(){
+  const $ = sel => document.querySelector(sel);
+  const logEl = $('#log');
+  const log = (html, cls='ok') => { const d=document.createElement('div'); d.className=cls; d.style.padding='6px 10px'; d.style.borderRadius='10px'; d.style.margin='6px 0'; d.innerHTML=html; logEl.prepend(d); };
+  const state = { theme: 'gtake', logo_url: '', background_url: '' };
+
+  const setPrev = () => {
+    $('#logoPrev').style.backgroundImage = state.logo_url ? `url('${state.logo_url}')` : 'none';
+    $('#bgPrev').style.backgroundImage   = state.background_url ? `url('${state.background_url}')` : 'none';
+  };
+
+  const fetchCfg = async () => {
+    try {
+      const r = await fetch('/api/ui-config');
+      const j = await r.json();
+      if (j) {
+        if (j.theme) state.theme = j.theme;
+        if (j.logo_url) state.logo_url = j.logo_url;
+        if (j.background_url) state.background_url = j.background_url;
+      }
+      $('#logoUrl').value = state.logo_url || '';
+      $('#bgUrl').value   = state.background_url || '';
+      setPrev();
+    } catch (e) { log('Gagal memuat config: '+e, 'err'); }
+  };
+
+  const doUpload = async (file) => {
+    const fd = new FormData(); fd.append('file', file, file.name||'image');
+    const r = await fetch('/dashboard/upload', { method:'POST', body: fd });
+    try{
+      const j = await r.json();
+      if (j && j.url) return j.url;
+    }catch(e){}
+    return URL.createObjectURL(file);
+  };
+
+  $('#logoFile').addEventListener('change', async (e)=>{
+    if (!e.target.files.length) return;
+    const url = await doUpload(e.target.files[0]);
+    state.logo_url = url; $('#logoUrl').value = url; setPrev();
+    log('✓ Logo diunggah.', 'ok');
+  });
+  $('#bgFile').addEventListener('change', async (e)=>{
+    if (!e.target.files.length) return;
+    const url = await doUpload(e.target.files[0]);
+    state.background_url = url; $('#bgUrl').value = url; setPrev();
+    log('✓ Background diunggah.', 'ok');
+  });
+
+  $('#logoUrl').addEventListener('input', e => { state.logo_url = e.target.value.trim(); setPrev(); });
+  $('#bgUrl').addEventListener('input', e => { state.background_url = e.target.value.trim(); setPrev(); });
+
+  $('#btnSave').addEventListener('click', async ()=>{
+    try{
+      const payload = { ...state, theme: 'gtake' };
+      const r = await fetch('/api/ui-config', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      if (!r.ok) throw new Error('HTTP '+r.status);
+      log('✓ Disimpan.', 'ok');
+    }catch(e){ log('✗ Gagal simpan: '+e, 'err'); }
+  });
+  $('#btnReset').addEventListener('click', async ()=>{
+    $('#logoUrl').value = ''; $('#bgUrl').value=''; state.logo_url=''; state.background_url=''; setPrev(); log('Reset nilai.', 'ok');
+  });
+
+  fetchCfg();
+})();
+</script>
+</body>
+</html>

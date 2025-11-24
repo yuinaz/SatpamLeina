@@ -1,0 +1,6 @@
+New-Item -ItemType Directory -Force -Path unused | Out-Null
+if (Test-Path 'satpambot/bot/modules/discord_bot/cogs/ban_commands.py') { Move-Item 'satpambot/bot/modules/discord_bot/cogs/ban_commands.py' 'unused/satpambot__bot__modules__discord_bot__cogs__ban_commands.py' -Force }
+if (Test-Path 'satpambot/bot/modules/discord_bot/cogs/ban_overrides.py') { Move-Item 'satpambot/bot/modules/discord_bot/cogs/ban_overrides.py' 'unused/satpambot__bot__modules__discord_bot__cogs__ban_overrides.py' -Force }
+if (Test-Path 'satpambot/bot/modules/discord_bot/cogs/image_poster.py') { Move-Item 'satpambot/bot/modules/discord_bot/cogs/image_poster.py' 'unused/satpambot__bot__modules__discord_bot__cogs__image_poster.py' -Force }
+if (Test-Path 'satpambot/bot/modules/discord_bot/cogs/testban_hybrid.py') { Move-Item 'satpambot/bot/modules/discord_bot/cogs/testban_hybrid.py' 'unused/satpambot__bot__modules__discord_bot__cogs__testban_hybrid.py' -Force }
+if (Test-Path 'satpambot/bot/modules/discord_bot/cogs/status_sticky_manual_proxy.py') { Move-Item 'satpambot/bot/modules/discord_bot/cogs/status_sticky_manual_proxy.py' 'unused/satpambot__bot__modules__discord_bot__cogs__status_sticky_manual_proxy.py' -Force }

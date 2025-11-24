@@ -1,0 +1,72 @@
+{% extends 'base.html
+{% block title %}🎨 Ganti Tema{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="/dashboard" class="btn btn-outline-light">⬅️ Dashboard</a>
+    <h3>🎨 Ganti Tema Tampilan</h3>
+    <span class="text-muted">👤 {{ session.username }}</span>
+  </div>
+
+  <form method="POST">
+    <div class="mb-3">
+      <label for="theme">Pilih Tema:</label>
+      <select id="ajax-theme" name="theme" class="form-select">
+        {% for theme in themes %}
+          <option value="{{ theme.name }}" {% if 'themes/' ~ theme.name == theme_css %}selected{% endif %}>
+            {{ theme.name.replace('.css', '').replace('-', ' ').title() }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-success">💾 Simpan Tema</button>
+      <button type="button" id="ajax-save" class="btn btn-primary">🔁 Simpan via AJAX</button>
+    </div>
+    <div id="ajax-status" class="mt-3 text-info"></div>
+  </form>
+</div>
+
+<script>
+// Tombol AJAX simpan dan ganti tema tanpa reload
+document.getElementById("ajax-save").addEventListener("click", function () {
+  const selectedTheme = document.getElementById("ajax-theme").value;
+
+  fetch("/theme", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ theme: selectedTheme })
+  })
+  .then(res => res.json())
+  .then(data => {
+    const status = document.getElementById("ajax-status");
+    if (data.status === "success") {
+      status.innerText = `✅ Tema berhasil diubah ke ${data.theme}`;
+      status.className = "mt-3 text-success";
+
+      const themeLink = document.getElementById("theme-style");
+      if (themeLink) {
+        themeLink.href = `/static/themes/${data.theme}`;
+      }
+    } else {
+      status.innerText = `❌ Gagal: ${data.message}`;
+      status.className = "mt-3 text-danger";
+    }
+  })
+  .catch(() => {
+    const status = document.getElementById("ajax-status");
+    status.innerText = "❌ Gagal menghubungi server.";
+    status.className = "mt-3 text-danger";
+  });
+});
+
+// Update <link id="theme-stylesheet"> instantly
+document.getElementById("ajax-theme").addEventListener("change", function(){
+  var link = document.getElementById("theme-stylesheet");
+  if(link){ link.href = "/static/themes/" + this.value.replace(/\.css$/,'') + ".css"; }
+});
+</script>
+{% endblock %}

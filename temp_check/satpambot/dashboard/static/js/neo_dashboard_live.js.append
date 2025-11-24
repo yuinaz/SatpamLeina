@@ -1,0 +1,22 @@
+
+;(function(){
+  function $(s){return document.querySelector(s)}
+  function renderBans(items){
+    var ol = $('#ban-feed'); if(!ol) return;
+    ol.innerHTML = '';
+    if(!items || !items.length){ ol.innerHTML = '<li>Tidak ada ban.</li>'; return; }
+    items.forEach(function(it, idx){
+      var user = it.user || ('<@'+(it.user_id||'?')+'>');
+      var li = document.createElement('li');
+      li.textContent = (idx+1)+'. '+user+' banned '+(it.when_str||it.when||'');
+      ol.appendChild(li);
+    });
+  }
+  function fetchBans(){
+    var el = $('#ban-feed'); if(!el) return;
+    fetch('/dashboard/api/bans?limit=10').then(function(r){return r.json()}).then(function(j){renderBans(j)}).catch(function(){renderBans([])});
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    fetchBans(); setInterval(fetchBans, 10000);
+  });
+})();

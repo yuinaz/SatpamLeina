@@ -1,0 +1,12 @@
+{
+  "id": "03ec76684086",
+  "created_at": 1760503099.7984746,
+  "status": "diagnosed",
+  "level": "WARNING",
+  "message": "[selfheal] groq propose failed: module 'satpambot.ml.groq_helper' has no attribute 'chat'",
+  "where": "satpambot.bot.modules.discord_bot.cogs.selfheal_autofix:_groq_propose_patch",
+  "time": 1760503099.7944853,
+  "diagnosis": {
+    "note": "Groq disabled or not configured."
+  }
+}

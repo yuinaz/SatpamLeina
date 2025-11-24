@@ -1,0 +1,233 @@
+{% extends "base_gtake.html" %}
+
+{% block content %}
+<div class="cards">
+
+  <!-- Aktivitas (CPU sparkline) -->
+  <article class="card">
+    <h3>Activity (60fps)</h3>
+    <canvas id="activityChart" width="900" height="180"></canvas>
+  </article>
+
+  <!-- Real-time counters -->
+  <div class="card" style="grid-column: 1 / -1;">
+    <div class="mini-monitor">
+      <div class="flex" style="gap:24px">
+        <div><div class="muted">Guilds</div><div id="live-guilds"   style="font-weight:700">--</div></div>
+        <div><div class="muted">Members</div><div id="live-members"  style="font-weight:700">--</div></div>
+        <div><div class="muted">Online</div><div id="live-online"   style="font-weight:700">--</div></div>
+        <div><div class="muted">Channels</div><div id="live-channels" style="font-weight:700">--</div></div>
+        <div><div class="muted">Threads</div><div id="live-threads"  style="font-weight:700">--</div></div>
+        <div><div class="muted">Latency</div><div id="live-lat"      style="font-weight:700">-- ms</div></div>
+      </div>
+      <div class="muted">Real-time counters</div>
+    </div>
+  </div>
+
+  <!-- Komponen dropzone (drag & drop file/URL pHash) -->
+  {% include 'components/phish_dropzone.html
+{% include 'components/today_log.html
+
+
+  <!-- Alternatif dropzone lama (jika JS-mu mengikat #dashDrop) -->
+  <div class="card">
+    <div id="dashDrop" class="dropzone" style="border:2px dashed rgba(255,255,255,.2);padding:1rem;border-radius:.75rem">
+      Drop files here…
+    </div>
+    <input id="dashPick" type="file" style="display:none" />
+  </div>
+
+  <!-- Banned Users (live) -->
+  <div class="card" style="grid-column: 1 / -1;">
+    <div class="flex" style="justify-content:space-between;align-items:center">
+      <h3 style="margin:0">Banned Users (live)</h3>
+      <button id="ban-refresh" class="btn btn-sm" type="button">Refresh</button>
+    </div>
+    <div class="table-responsive" style="margin-top:8px">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Time</th><th>User</th><th>ID</th><th>Reason</th><th>By</th>
+          </tr>
+        </thead>
+        <tbody id="ban-feed">
+          <tr><td colspan="5" class="muted">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Mini monitor -->
+  <div class="card">
+    <div class="mini-monitor">
+      <div>
+        <b>Mini Monitor <small class="muted">(real-time)</small></b>
+        <div id="mm-uptime" class="muted">Uptime: <span id="mm-up-real">--</span> --</div>
+      </div>
+      <div style="text-align:right">
+        <div id="mm-cpu"><b>CPU: <span id="mm-cpu-real">--</span>%</b> --%</div>
+        <div id="mm-ram" class="muted">RAM: <span id="mm-ram-real">--</span>% -- MB</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- My files (dipertahankan) -->
+  <div class="card">
+    <h3>My files</h3>
+    <div class="muted">You have not added a file yet</div>
+    <div style="margin-top:12px">
+      <a class="btn" href="#">Add file</a>
+    </div>
+  </div>
+
+  <!-- Activity (tambahan—dipertahankan) -->
+  <div class="card">
+    <h3>Activity (60fps)</h3>
+    <div class="muted">13 Tasks Completed</div>
+    <canvas id="chart" width="400" height="120"></canvas>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block body_end %}
+<script>
+  // ====== Banned Users (live) ======
+  (function () {
+    const FEED_ID = "ban-feed";
+    const BTN_ID  = "ban-refresh";
+
+    async function fetchBans(limit = 10) {
+      const tryUrls = [
+        `/dashboard/api/bans?limit=${limit}`,          // dari app_dashboard.py
+        `/dashboard/api/banned_users?limit=${limit}`   // dari webui.py
+      ];
+      for (const url of tryUrls) {
+        try {
+          const r = await fetch(url, { cache: "no-store" });
+          if (!r.ok) continue;
+          const j = await r.json();
+          if (Array.isArray(j)) return j;          // format /api/bans
+          if (j && Array.isArray(j.rows)) return j.rows; // format /api/banned_users
+        } catch (e) {}
+      }
+      throw new Error("Tidak bisa memuat data ban.");
+    }
+
+    function rowHTML(x) {
+      const when      = x.when_str || x.time_human || x.time || "";
+      const user      = x.username || x.name || "-";
+      const uid       = x.user_id || x.uid || "-";
+      const reason    = x.reason || "-";
+      const moderator = x.moderator || x.mod || "-";
+      return `<tr>
+        <td>${when}</td>
+        <td>${user}</td>
+        <td>${uid}</td>
+        <td>${reason}</td>
+        <td>${moderator}</td>
+      </tr>`;
+    }
+
+    async function refreshBans() {
+      const tb = document.getElementById(FEED_ID);
+      if (!tb) return;
+      tb.innerHTML = `<tr><td colspan="5" class="muted" style="opacity:.7">Loading...</td></tr>`;
+      try {
+        const rows = await fetchBans(10);
+        tb.innerHTML = rows && rows.length
+          ? rows.map(rowHTML).join("")
+          : `<tr><td colspan="5" class="muted" style="opacity:.7">Belum ada data.</td></tr>`;
+      } catch (e) {
+        tb.innerHTML = `<tr><td colspan="5" class="muted" style="opacity:.7">Gagal memuat.</td></tr>`;
+      }
+    }
+
+    document.getElementById(BTN_ID)?.addEventListener("click", refreshBans);
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", refreshBans);
+    } else {
+      refreshBans();
+    }
+    setInterval(refreshBans, 10000);
+  })();
+
+  // ====== Metrics (counters + chart + mini monitor) ======
+  (function () {
+    const ids = {
+      guilds:   "live-guilds",
+      members:  "live-members",
+      online:   "live-online",
+      channels: "live-channels",
+      threads:  "live-threads",
+      latency:  "live-lat",
+      cpu:      "mm-cpu-real",
+      ram:      "mm-ram-real",
+      up:       "mm-up-real",
+    };
+
+    const chartEl = document.getElementById('activityChart');
+    const ctx = chartEl ? chartEl.getContext('2d') : null;
+    const cpuSeries = [];
+
+    function setText(id, val) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = val;
+    }
+
+    function drawChart() {
+      if (!ctx || !chartEl) return;
+      const W = chartEl.width, H = chartEl.height;
+      ctx.clearRect(0, 0, W, H);
+      ctx.beginPath();
+      ctx.moveTo(0, H * 0.8);
+      for (let x = 0; x < W; x++) {
+        const idx = Math.max(0, cpuSeries.length - W + x);
+        const v = cpuSeries[idx] || 0; // 0..100
+        const y = H * 0.85 - (v / 100) * (H * 0.6);
+        ctx.lineTo(x, y);
+      }
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(147,197,253,.9)';
+      ctx.stroke();
+    }
+
+    async function pollMetrics() {
+      try {
+        const r = await fetch('/dashboard/api/metrics', { cache: 'no-store' });
+        if (!r.ok) return;
+        const j = await r.json();
+
+        // Update counters (gunakan keys yang tersedia)
+        setText(ids.guilds,   j.guilds   ?? '--');
+        setText(ids.members,  j.members  ?? '--');
+        setText(ids.online,   j.online   ?? '--');
+        setText(ids.channels, j.channels ?? '--');
+        setText(ids.threads,  j.threads  ?? '--');
+        setText(ids.latency,  (j.latency_ms ?? '--') + ' ms');
+
+        // Mini monitor
+        const cpu = Number(j.cpu_percent || 0);
+        const ramMB = Number(j.ram_mb || 0);
+        setText(ids.cpu, String(cpu.toFixed(0)));
+        setText(ids.ram, String(ramMB.toFixed(0)));
+        // uptime tidak disediakan endpoint ini — biarkan placeholder
+
+        // Chart pakai CPU %
+        cpuSeries.push(cpu);
+        if (cpuSeries.length > 1000) cpuSeries.splice(0, cpuSeries.length - 1000);
+        drawChart();
+      } catch (e) {}
+    }
+
+    setInterval(pollMetrics, 2000);
+    pollMetrics();
+  })();
+</script>
+{% endblock %}
+
+<script src="/dashboard/dashboard-static/js/remove_option_button.js"></script>
+
+<!-- G.TAKE -->
+
+<script src="/dashboard-static/js/phash_poller.js?v={{ cache_bust }}"></script>

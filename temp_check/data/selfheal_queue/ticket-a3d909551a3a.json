@@ -1,0 +1,12 @@
+{
+  "id": "a3d909551a3a",
+  "created_at": 1760503515.0787737,
+  "status": "diagnosed",
+  "level": "ERROR",
+  "message": "[hotenv] failed to reload satpambot.bot.modules.discord_bot.cogs.neuro_governor_bootstrap",
+  "where": "satpambot.bot.modules.discord_bot.cogs.hot_env_reload:_reload_one",
+  "time": 1760503515.0757806,
+  "diagnosis": {
+    "note": "Groq disabled or not configured."
+  }
+}

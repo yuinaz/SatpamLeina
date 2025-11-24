@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-3">🖼️ Edit Image Hash Blacklist</h2>
+
+  {% if message %}
+    <div class="alert alert-success">{{ message }}</div>
+  {% elif error %}
+    <div class="alert alert-danger">{{ error }}</div>
+  {% endif %}
+
+  <form method="POST">
+    <div class="mb-3">
+      <label for="content" class="form-label">Daftar Hash (1 baris = 1 hash):</label>
+      <textarea class="form-control" id="content" name="content" rows="15">{{ content }}</textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">💾 Simpan</button>
+    <a href="" class="btn btn-secondary">🔄 Refresh</a>
+  </form>
+</div>
+{% endblock %}

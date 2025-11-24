@@ -1,0 +1,12 @@
+{
+  "id": "0db22f69522b",
+  "created_at": 1760503514.4035096,
+  "status": "diagnosed",
+  "level": "WARNING",
+  "message": "[autoload_plus] skip satpambot.bot.modules.discord_bot.cogs.web_search_groq_bridge: Extension 'satpambot.bot.modules.discord_bot.cogs.web_search_groq_bridge' is already loaded.",
+  "where": "satpambot.bot.modules.discord_bot.cogs.a00_overlay_autoload_plus:cog_load",
+  "time": 1760503514.402514,
+  "diagnosis": {
+    "note": "Groq disabled or not configured."
+  }
+}

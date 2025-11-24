@@ -1,0 +1,19 @@
+# runtime.example.toml
+[persona]
+name = "leina"
+style = "ringkas, hangat, 1 follow-up max"
+voice = "female-soft-id"
+
+[qna]
+enabled = true
+channel_id = 1426571542627614772
+interval_min = 120
+interval_max = 420
+
+[memory]
+enable = true
+topk = 12
+token_budget = 800
+decay_half_life_h = 72
+redact_pii = true
+approval_required = false

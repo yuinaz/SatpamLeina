@@ -1,0 +1,51 @@
+<div class="card" style="margin-top:1rem;">
+  <div class="card-header">
+    <strong>Updated today log</strong>
+    <button id="today-log-refresh" class="btn btn-sm" style="float:right;">Reload</button>
+  </div>
+  <div class="card-body">
+    <ul id="today-log-list" style="list-style: none; padding-left: 0; margin: 0;"></ul>
+    <div id="today-log-empty" class="text-muted" style="display:none;">Belum ada upload hari ini.</div>
+    <div id="today-log-error" class="text-danger" style="display:none;">Gagal memuat log.</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const LIST = document.getElementById('today-log-list');
+  const EMPTY = document.getElementById('today-log-empty');
+  const ERR  = document.getElementById('today-log-error');
+  const BTN  = document.getElementById('today-log-refresh');
+
+  async function loadToday() {
+    try {
+      ERR.style.display = 'none';
+      LIST.innerHTML = '';
+      const res = await fetch('/dashboard/api/uploads/today', {cache:'no-store'});
+      const j = await res.json();
+      const items = (j.items || []);
+      if (!items.length) {
+        EMPTY.style.display = 'block';
+        return;
+      }
+      EMPTY.style.display = 'none';
+      LIST.innerHTML = items.map(e => {
+        const ts = new Date((e.ts||0)*1000);
+        const when = ts.toLocaleString('en-GB',{hour12:false});
+        const file = (e.filename||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const hash = (e.hash||'').substring(0,32);
+        return `<li style="padding:4px 0;border-bottom:1px solid rgba(0,0,0,.06)">
+          <code style="opacity:.75">${when}</code> — <strong>${file}</strong>
+          <small style="opacity:.8"> (hash: ${hash})</small>
+        </li>`;
+      }).join('');
+    } catch(e) {
+      console.error('today log error', e);
+      ERR.style.display = 'block';
+    }
+  }
+
+  BTN && BTN.addEventListener('click', loadToday);
+  loadToday();
+})();
+</script>

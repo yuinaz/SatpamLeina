@@ -1,0 +1,6 @@
+.wrap{font-family:system-ui,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;background:#0f1020;color:#d5d3e7;border:1px solid #2c2848;border-radius:14px;padding:12px;width:300px}
+.row{display:flex;align-items:center;gap:8px;margin:4px 0}
+.dot{width:10px;height:10px;border-radius:50%;background:#777}
+.dot.ok{background:#2ecc71}.dot.warn{background:#f1c40f}.dot.err{background:#e74c3c}
+.label{font-weight:600;min-width:80px}.sub{font-size:12px;color:#a19bbf;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.btns{display:flex;gap:8px;margin-top:8px}button{flex:1;background:#1e1b3a;border:1px solid #2c2848;color:#eae8ff;border-radius:10px;padding:6px 10px;cursor:pointer}button:hover{filter:brightness(1.1)}

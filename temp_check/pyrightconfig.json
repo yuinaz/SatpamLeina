@@ -1,0 +1,8 @@
+{
+  "venvPath": "${workspaceFolder}",
+  "venv": ".venv",
+  "pythonVersion": "3.10",
+  "typeCheckingMode": "basic",
+  "reportMissingImports": false,
+  "exclude": ["**/node_modules", "**/.venv", "**/.git"]
+}

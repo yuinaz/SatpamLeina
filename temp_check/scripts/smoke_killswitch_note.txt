@@ -1,0 +1,1 @@
+Killswitch overlay added. It removes cogs matching patterns in DISABLE_MODULE_PATTERNS at on_ready.

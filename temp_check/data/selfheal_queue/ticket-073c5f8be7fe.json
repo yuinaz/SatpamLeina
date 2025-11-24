@@ -1,0 +1,12 @@
+{
+  "id": "073c5f8be7fe",
+  "created_at": 1760503099.092102,
+  "status": "diagnosed",
+  "level": "WARNING",
+  "message": "Command error by 228126085160763392 in #1426571542627614772: CommandNotFound('Command \"qna\" is not found')",
+  "where": "satpambot.bot.modules.discord_bot.cogs.prefix_mod_only:on_command_error",
+  "time": 1760503099.092102,
+  "diagnosis": {
+    "note": "Groq disabled or not configured."
+  }
+}

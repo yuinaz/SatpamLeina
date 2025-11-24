@@ -1,0 +1,30 @@
+{% extends "base_gtake.html" %}
+
+{% block content %}
+<div class="cards">
+  <div class="card">
+    <h3>Security — Drag & Drop</h3>
+    <!-- Dropzone yang dikenali smoketest -->
+    <div id="dropZone" class="dropzone"
+         style="border:2px dashed rgba(255,255,255,.25);padding:16px;border-radius:12px">
+      Drop files here…
+    </div>
+    <div class="muted" style="margin-top:.5rem">You can also paste an image or URL.</div>
+  </div>
+
+  <div class="card">
+    <h3>Legacy Upload</h3>
+    <form id="legacy-form" action="/dashboard/security/upload" method="post" enctype="multipart/form-data">
+      <input type="file" name="file">
+      <button class="btn" type="submit">Upload</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block body_end %}
+<!-- Loader drag&drop pHash (non-breaking: file & URL, fallback endpoint lama) -->
+<script src="/dashboard-static/js/dragdrop_phash.js"></script>
+{% endblock %}
+
+<script src="/dashboard-static/js/phash_poller.js?v={{ cache_bust }}"></script>

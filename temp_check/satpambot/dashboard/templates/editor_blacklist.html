@@ -1,0 +1,13 @@
+{% extends 'base.html
+{% block content %}
+<h1 class="mb-4">Edit Blacklist Gambar</h1>
+<form method="post">
+  <div class="mb-3">
+    <label class="form-label">Tambah Hash / Kata Kunci</label>
+    <input type="text" class="form-control" name="entry" placeholder="mis. phash hex atau keyword">
+  </div>
+  <button class="btn btn-primary" type="submit">Simpan</button>
+</form>
+{% endblock %}
+
+<script src="/dashboard-static/js/phash_poller.js?v={{ cache_bust }}"></script>

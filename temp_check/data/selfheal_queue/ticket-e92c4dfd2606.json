@@ -1,0 +1,12 @@
+{
+  "id": "e92c4dfd2606",
+  "created_at": 1760503514.3347304,
+  "status": "diagnosed",
+  "level": "WARNING",
+  "message": "[autoload_no_autodel_embed] Extension 'satpambot.bot.modules.discord_bot.cogs.a05_autodelete_exempt_overlay' is already loaded.",
+  "where": "satpambot.bot.modules.discord_bot.cogs.a00_overlay_autoload_no_autodel_embed:cog_load",
+  "time": 1760503514.3337307,
+  "diagnosis": {
+    "note": "Groq disabled or not configured."
+  }
+}

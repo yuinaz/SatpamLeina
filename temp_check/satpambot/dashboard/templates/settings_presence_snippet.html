@@ -1,0 +1,26 @@
+<section id="satpambot-phish-live" style="margin-top:24px;">
+  <h3>Phish Lab & Live</h3>
+  <div id="phish-drop" class="dropbox" 
+       style="border:2px dashed var(--border-color,#888);border-radius:12px;padding:24px;text-align:center;margin:12px 0;">
+    Drop image here
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+    <input id="phish-file" type="file" accept="image/*">
+    <input id="phish-url" type="url" placeholder="Image URL" style="flex:1;min-width:260px;">
+    <button id="phish-submit">Add Hash</button>
+    <span id="phish-result" style="margin-left:8px;"></span>
+  </div>
+  <hr>
+  <h4>Live Stats</h4>
+  <div style="display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:12px;">
+    {% for k in ['guilds','members','channels','threads','online','latency_ms'] %}
+    <div class="card" style="padding:14px;border-radius:12px;background:var(--card-bg,#1118);backdrop-filter: blur(6px);">
+      <div style="font-size:12px;opacity:.8;text-transform:uppercase;">{{k}}</div>
+      <div id="stat-{{k}}" style="font-size:20px;font-weight:700;">0</div>
+    </div>
+    {% endfor %}
+  </div>
+  <div style="margin-top:8px;font-size:12px;opacity:.8;">Updated: <span id="stat-updated">-</span></div>
+  <script src="/dashboard/static/js/phish_drop.js"></script>
+  <script src="/dashboard/static/js/neo_dashboard_live.js"></script>
+</section>

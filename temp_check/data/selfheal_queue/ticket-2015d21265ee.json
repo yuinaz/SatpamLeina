@@ -1,0 +1,12 @@
+{
+  "id": "2015d21265ee",
+  "created_at": 1760503514.219092,
+  "status": "diagnosed",
+  "level": "WARNING",
+  "message": "[autoload_status_coalescer] Extension 'satpambot.bot.modules.discord_bot.cogs.a06_status_coalescer_overlay' is already loaded.",
+  "where": "satpambot.bot.modules.discord_bot.cogs.a00_autoload_status_coalescer:cog_load",
+  "time": 1760503514.218581,
+  "diagnosis": {
+    "note": "Groq disabled or not configured."
+  }
+}
